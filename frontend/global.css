@@ -1,0 +1,13 @@
+body {
+  margin: 0;
+  padding: 0;
+  background-color: rgb(89, 89, 89);
+  height: 100vh;
+  display: grid;
+}
+
+canvas {
+  image-rendering: pixelated;
+  place-self: center;
+  border: 1px solid black;
+}

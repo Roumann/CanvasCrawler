@@ -1,0 +1,101 @@
+Game
+ - Scene1(level 1)
+    - GameObjects (enemies, player, etc.)
+ - Scene2(level 2)
+  - GameObjects (enemies, player, etc.)
+ - Scene3(level 3)
+  - GameObjects (enemies, player, etc.)
+
+
+ GameObject
+   - render
+      - draw (image / shape)
+   - update
+      - move 
+   - collide
+      - check collision with other game objects
+   - destroy
+      - remove from scene
+
+
+Events
+  - emit
+    - event name
+    - data
+  - on
+    - event name
+    - callback
+  - off (single specific event)
+    - event name/id
+    - callback
+  - unsubscribe (when object is destroyed to prevent memory leaks)
+    - event name/id
+
+
+const game = new Game();
+
+const hero = new Hero();
+game.addChild(hero);
+
+const enemy = new Enemy();
+game.addChild(enemy);
+
+
+game.start()
+
+
+Crate a LevelObject that holds all the info about a level and then loop through it and create the GameObjects etc.
+
+[
+  {
+    level: 1,
+    name: "level 1",
+    settings: {
+      backgroundImageSrc: "/level_1.png",
+      enemySpawnRate: 10,
+      stageGoal: {
+        info: "Kill 200 enemies",
+        enemiesKilled: 0,
+        enemiesToKill: 200,
+      }
+      playerStartPosition: { x: 100, y: 100 },
+    },
+    gameObjects: [
+        {
+          type: "player",
+          position: { x: 100, y: 100 },
+          size: { x: 32, y: 32 },
+          src: "/char_1.png",
+          animationMap: heroAnimations,
+          currentAnimation: "idle-down" as HeroAnimations,
+        },
+        {
+          type: "Gem",
+          position: { x: 200, y: 100 },
+          size: { x: 32, y: 32 },
+          src: "/gem.png",
+          animationMap: heroAnimations,
+          currentAnimation: "walk-up" as HeroAnimations,
+        },
+    ],
+    npcs: [
+        {
+          type: "enemy",
+          position: { x: 200, y: 100 },
+          size: { x: 32, y: 32 },
+          src: "/char_1.png",
+          animationMap: heroAnimations,
+          currentAnimation: "walk-up" as HeroAnimations,
+        },
+        {
+          type: "enemy",
+          position: { x: 300, y: 100 },
+          size: { x: 32, y: 32 },
+          src: "/char_1.png",
+          animationMap: heroAnimations,
+          currentAnimation: "walk-up" as HeroAnimations,
+        },
+    ],
+  },
+]
+ 
