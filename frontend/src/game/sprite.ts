@@ -1,3 +1,4 @@
+import { Camera } from "./camera";
 import { GameObject } from "./game-object";
 
 type SpriteType = {
@@ -40,8 +41,18 @@ export class Sprite {
     };
 
     // Animations
-    this.animations = animations ?? new Map([["default", [[0, 0]]]]);
-    this.currentAnimation = currentAnimation ?? "default";
+    this.animations =
+      animations ??
+      new Map([
+        [
+          "idle",
+          [
+            [0, 0],
+            [0, 1],
+          ],
+        ],
+      ]);
+    this.currentAnimation = currentAnimation ?? "idle";
     this.currentAnimationFrame = 0;
     this.frameRate = frameRate ?? 32;
     this.frameProgress = this.frameRate;
@@ -49,14 +60,14 @@ export class Sprite {
     this.scale = scale ?? 1;
   }
 
-  draw(ctx: CanvasRenderingContext2D, camera: GameObject) {
+  draw(ctx: CanvasRenderingContext2D, camera: Camera) {
     if (!this.isLoaded) {
       return;
     }
 
-    // TODO move the camer to make 32x32 assets work centered maybe resihze the map
-    const cameraX = this.gameObject.position.x - 8 + 8 * 16 - camera.position.x;
-    const cameraY = this.gameObject.position.y - 8 + 8 * 16 - camera.position.y;
+    // TODO move the camera to make 32x32 assets work centered maybe resize the map
+    let cameraX = this.gameObject.position.x - camera.x;
+    let cameraY = this.gameObject.position.y - camera.y;
 
     const [frameX, frameY] = this.frame;
 

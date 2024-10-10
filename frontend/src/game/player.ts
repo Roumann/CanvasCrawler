@@ -1,43 +1,29 @@
-import { HeroAnimations, heroAnimations } from "../animations/hero";
+import { CharTwoAnimations, charTwoAnimations } from "../animations/hero";
 import { Controlls } from "./controlls";
 import { GameObject } from "./game-object";
 import { Vector2 } from "./vector2";
 
 export class Player extends GameObject {
   controlls: Controlls;
+  speed: number;
+  direction: string;
 
   constructor({ position, size }: { position: Vector2; size: Vector2 }) {
     super({
       position,
       size,
-      src: "/characters/char_1.png",
-      animationMap: heroAnimations,
-      currentAnimation: "idle-down" as HeroAnimations,
+      src: "/characters/char_4.png",
+      animationMap: charTwoAnimations,
+      currentAnimation: "idle-left" as CharTwoAnimations,
+      frameRate: 32,
     });
-    this.controlls = new Controlls();
+    this.direction = "right";
+    this.controlls = new Controlls(this);
     this.controlls.addEventListeners();
+    this.speed = 3;
   }
 
   update() {
-    if (!this.controlls) {
-      return;
-    }
-
-    if (this.controlls.left) {
-      console.log("left");
-      this.sprite.currentAnimation = "walk-left";
-      this.position.x -= 0.5;
-    } else if (this.controlls.right) {
-      this.sprite.currentAnimation = "walk-right";
-      this.position.x += 0.5;
-    } else if (this.controlls.up) {
-      this.sprite.currentAnimation = "walk-up";
-      this.position.y -= 0.5;
-    } else if (this.controlls.down) {
-      this.sprite.currentAnimation = "walk-down";
-      this.position.y += 0.5;
-    } else {
-      this.sprite.currentAnimation = "idle-down";
-    }
+    this.controlls.update();
   }
 }
