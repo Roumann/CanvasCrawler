@@ -9,7 +9,7 @@ export class Game {
   constructor(ctx: CanvasRenderingContext2D) {
     this.ctx = ctx;
     this.gameObjects = [];
-    this.world = level1; // todo change to decoupled
+    this.world = level1; // todo change to decoupled - save progress to local storage so check storage first if nothing load level 1
     //TODO fix this
     this.camera = new Camera(this.world.gameObjects.player, this.ctx);
   }
@@ -30,8 +30,6 @@ export class Game {
 
   render() {
     this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
-
-    // const camera = this.world.gameObjects.player;
 
     this.world.map.draw(this.ctx, this.camera);
 

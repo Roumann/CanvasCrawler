@@ -8,7 +8,6 @@ type SpriteType = {
   gameObject: GameObject;
   frameRate?: number;
   frameLimit?: number;
-  isStatic?: boolean;
   scale?: number;
 };
 
@@ -21,7 +20,6 @@ export class Sprite {
   frameRate: number;
   frameProgress: number;
   currentAnimationFrame: number;
-  isStatic: boolean;
   scale: number;
 
   constructor({
@@ -30,17 +28,16 @@ export class Sprite {
     currentAnimation,
     frameRate,
     gameObject,
-    isStatic,
     scale,
   }: SpriteType) {
     this.gameObject = gameObject;
     this.image = new Image();
-    this.image.src = imageSrc ?? "/no_src.png";
+    this.image.src = imageSrc ?? "/items/no_src.png";
     this.image.onload = () => {
       this.isLoaded = true;
     };
 
-    // Animations
+    // Animation stuff
     this.animations =
       animations ??
       new Map([
@@ -56,7 +53,6 @@ export class Sprite {
     this.currentAnimationFrame = 0;
     this.frameRate = frameRate ?? 32;
     this.frameProgress = this.frameRate;
-    this.isStatic = isStatic ?? false;
     this.scale = scale ?? 1;
   }
 
@@ -65,12 +61,13 @@ export class Sprite {
       return;
     }
 
-    // TODO move the camera to make 32x32 assets work centered maybe resize the map
+    // Using 32x32 sprites, so we need to offset the camera by 8 px to center on 16x16 grid
     let cameraX = this.gameObject.position.x - camera.x;
     let cameraY = this.gameObject.position.y - camera.y;
 
     const [frameX, frameY] = this.frame;
 
+    ctx.imageSmoothingEnabled = false;
     ctx.drawImage(
       this.image,
       frameX * this.gameObject.size.x,
@@ -83,9 +80,7 @@ export class Sprite {
       this.gameObject.size.y * this.scale
     );
 
-    if (!this.isStatic) {
-      this.animate();
-    }
+    this.animate();
   }
 
   animate() {

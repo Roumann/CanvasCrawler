@@ -31,6 +31,6 @@ requestAnimationFrame(gameLoop);
 // debug Grid
 // for (let i = 0; i < canvas.width; i++) {
 //   for (let j = 0; j < canvas.height; j++) {
-//     ctx.strokeRect(i * 16, j * 16, 16, 16);
+//     ctx.strokeRect(i * 32, j * 32, 32, 32);
 //   }
 // }

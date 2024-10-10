@@ -9,7 +9,6 @@ type GameObjectType = {
   animationMap?: Map<string, any>;
   currentAnimation?: string;
   frameRate?: number;
-  isStatic?: boolean;
 };
 
 export class GameObject {
@@ -27,7 +26,6 @@ export class GameObject {
     animationMap,
     currentAnimation,
     frameRate,
-    isStatic,
   }: GameObjectType) {
     this.position = position;
     this.size = size;
@@ -39,7 +37,6 @@ export class GameObject {
       animations: animationMap,
       currentAnimation: currentAnimation,
       frameRate: frameRate,
-      isStatic: isStatic,
     });
   }
 

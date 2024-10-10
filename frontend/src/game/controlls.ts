@@ -3,12 +3,12 @@ import { clamp } from "./utils";
 
 export class Controlls {
   player: Player;
-  pressedKeys: string[];
-  keyMap: any;
+  pressedKeys: Set<string>;
+  keyMap: { [key: string]: string };
 
   constructor(player: Player) {
     this.player = player;
-    this.pressedKeys = [];
+    this.pressedKeys = new Set();
     this.keyMap = {
       ArrowLeft: "left",
       ArrowRight: "right",
@@ -21,72 +21,70 @@ export class Controlls {
 
   addEventListeners() {
     window.addEventListener("keydown", (e) => {
-      if (this.pressedKeys.includes(this.keyMap[e.key])) {
-        return;
+      if (this.keyMap[e.key] && !this.pressedKeys.has(this.keyMap[e.key])) {
+        this.pressedKeys.add(this.keyMap[e.key]);
       }
-      this.pressedKeys.push(this.keyMap[e.key]);
     });
 
     window.addEventListener("keyup", (e) => {
-      this.pressedKeys = this.pressedKeys.filter(
-        (key) => key !== this.keyMap[e.key]
-      );
+      if (this.keyMap[e.key]) {
+        this.pressedKeys.delete(this.keyMap[e.key]);
+      }
     });
   }
 
-  //TODO fix this
   update() {
-    const movingDirection = this.pressedKeys[0];
+    if (this.pressedKeys.size === 0) {
+      this.setIdleAnimation();
+      return;
+    }
 
-    if (movingDirection) {
-      if (movingDirection === "left") {
+    this.pressedKeys.forEach((direction) => this.movePlayer(direction));
+  }
+
+  movePlayer(direction: string) {
+    switch (direction) {
+      case "left":
         this.player.direction = "left";
         this.player.sprite.currentAnimation = "walk-left";
         this.player.position.x = clamp(
           this.player.position.x - this.player.speed,
           0,
-          1600 - this.player.size.x
+          3200 - this.player.size.x
         );
-      }
-      if (movingDirection === "right") {
+        break;
+      case "right":
         this.player.direction = "right";
         this.player.sprite.currentAnimation = "walk-right";
         this.player.position.x = clamp(
           this.player.position.x + this.player.speed,
           0,
-          1600 - this.player.size.x
+          3200 - this.player.size.x
         );
-      }
-      if (movingDirection === "up") {
-        if (this.player.direction === "left") {
-          this.player.sprite.currentAnimation = "walk-up-l";
-        } else if (this.player.direction === "right") {
-          this.player.sprite.currentAnimation = "walk-up-r";
-        }
+        break;
+      case "up":
+        this.player.sprite.currentAnimation =
+          this.player.direction === "left" ? "walk-up-l" : "walk-up-r";
         this.player.position.y = clamp(
           this.player.position.y - this.player.speed,
           0,
-          1600 - this.player.size.y
+          3200 - this.player.size.y
         );
-      }
-      if (movingDirection === "down") {
-        if (this.player.direction === "left") {
-          this.player.sprite.currentAnimation = "walk-down-l";
-        } else if (this.player.direction === "right") {
-          this.player.sprite.currentAnimation = "walk-down-r";
-        }
+        break;
+      case "down":
+        this.player.sprite.currentAnimation =
+          this.player.direction === "left" ? "walk-down-l" : "walk-down-r";
         this.player.position.y = clamp(
           this.player.position.y + this.player.speed,
           0,
-          1600 - this.player.size.y
+          3200 - this.player.size.y
         );
-      }
-    } else {
-      if (this.player.direction === "left") {
-        this.player.sprite.currentAnimation = "idle-left";
-      } else if (this.player.direction === "right") {
-        this.player.sprite.currentAnimation = "idle-right";
-      }
+        break;
     }
+  }
+
+  setIdleAnimation() {
+    const idleDir = this.player.direction === "left" ? "left" : "right";
+    this.player.sprite.currentAnimation = `idle-${idleDir}`;
   }
 }

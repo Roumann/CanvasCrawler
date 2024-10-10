@@ -1,4 +1,4 @@
-import { CharTwoAnimations, charTwoAnimations } from "../animations/hero";
+import { PlayerAnimations, playerAnimations } from "../animations/player";
 import { Controlls } from "./controlls";
 import { GameObject } from "./game-object";
 import { Vector2 } from "./vector2";
@@ -13,14 +13,15 @@ export class Player extends GameObject {
       position,
       size,
       src: "/characters/char_4.png",
-      animationMap: charTwoAnimations,
-      currentAnimation: "idle-left" as CharTwoAnimations,
-      frameRate: 32,
+      animationMap: playerAnimations,
+      currentAnimation: "idle-left" as PlayerAnimations,
+      frameRate: 28,
     });
     this.direction = "right";
     this.controlls = new Controlls(this);
     this.controlls.addEventListeners();
-    this.speed = 3;
+
+    this.speed = 0.5;
   }
 
   update() {

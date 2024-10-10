@@ -16,7 +16,7 @@ export class Camera {
     this.ctx = ctx;
     this.worldBounds = {
       min: 0,
-      max: 1600,
+      max: 3200,
     };
   }
 
