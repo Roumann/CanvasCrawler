@@ -1,16 +1,19 @@
 import { Camera } from "./camera";
+import { MapObject } from "../../public/maps/map_3";
 
 export class World {
   image: HTMLImageElement;
   isLoaded: boolean = false;
-
+  walls: any;
   constructor({ src }: { src: string }) {
     this.image = new Image();
     this.image.src = src ?? "/no_src.png";
     this.image.onload = () => {
       this.isLoaded = true;
     };
+    this.walls = MapObject.layers[1].data;
   }
+
   draw(ctx: CanvasRenderingContext2D, camera: Camera) {
     let sX = camera.x;
     let sY = camera.y;
@@ -38,5 +41,29 @@ export class World {
       dW,
       dH
     );
+
+    // for (let eachRow = 0; eachRow < 100; eachRow++) {
+    //   for (let eachCol = 0; eachCol < 100; eachCol++) {
+    //     let arrayIndex = eachRow * 100 + eachCol;
+
+    //     if (this.walls[arrayIndex] === 0) {
+    //       ctx.strokeStyle = "#000";
+    //       ctx.strokeRect(
+    //         eachCol * 16 - camera.x,
+    //         eachRow * 16 - camera.y,
+    //         16,
+    //         16
+    //       );
+    //     } else {
+    //       ctx.strokeStyle = "#fff";
+    //       ctx.strokeRect(
+    //         eachCol * 16 - camera.x,
+    //         eachRow * 16 - camera.y,
+    //         16,
+    //         16
+    //       );
+    //     }
+    //   }
+    // }
   }
 }

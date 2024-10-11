@@ -5,7 +5,6 @@ type GameObjectType = {
   position: Vector2;
   size: Vector2;
   src?: string;
-  scale?: number;
   animationMap?: Map<string, any>;
   currentAnimation?: string;
   frameRate?: number;
@@ -21,7 +20,7 @@ export class GameObject {
   constructor({
     position,
     size,
-    scale,
+
     src,
     animationMap,
     currentAnimation,
@@ -32,7 +31,6 @@ export class GameObject {
     this.currentAnimation = currentAnimation ?? "default";
     this.sprite = new Sprite({
       imageSrc: src,
-      scale: scale,
       gameObject: this,
       animations: animationMap,
       currentAnimation: currentAnimation,

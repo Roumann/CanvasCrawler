@@ -20,7 +20,6 @@ export class Sprite {
   frameRate: number;
   frameProgress: number;
   currentAnimationFrame: number;
-  scale: number;
 
   constructor({
     imageSrc,
@@ -28,7 +27,6 @@ export class Sprite {
     currentAnimation,
     frameRate,
     gameObject,
-    scale,
   }: SpriteType) {
     this.gameObject = gameObject;
     this.image = new Image();
@@ -37,7 +35,6 @@ export class Sprite {
       this.isLoaded = true;
     };
 
-    // Animation stuff
     this.animations =
       animations ??
       new Map([
@@ -53,7 +50,6 @@ export class Sprite {
     this.currentAnimationFrame = 0;
     this.frameRate = frameRate ?? 32;
     this.frameProgress = this.frameRate;
-    this.scale = scale ?? 1;
   }
 
   draw(ctx: CanvasRenderingContext2D, camera: Camera) {
@@ -61,23 +57,25 @@ export class Sprite {
       return;
     }
 
-    // Using 32x32 sprites, so we need to offset the camera by 8 px to center on 16x16 grid
     let cameraX = this.gameObject.position.x - camera.x;
     let cameraY = this.gameObject.position.y - camera.y;
 
     const [frameX, frameY] = this.frame;
 
+    // Draw box around the sprite
+    // ctx.strokeRect(cameraX, cameraY, 16, 16);
+
     ctx.imageSmoothingEnabled = false;
     ctx.drawImage(
       this.image,
-      frameX * this.gameObject.size.x,
-      frameY * this.gameObject.size.y,
-      this.gameObject.size.x,
-      this.gameObject.size.x,
-      Math.floor(cameraX),
-      Math.floor(cameraY),
-      this.gameObject.size.x * this.scale,
-      this.gameObject.size.y * this.scale
+      frameX * 32, // Sprites are 32x32 pixels
+      frameY * 32,
+      32, //this selects the whole 32x32 sprite and not just small part
+      32,
+      Math.floor(cameraX - 8), // offset character to make him look centered
+      Math.floor(cameraY - 12),
+      32, // keeps the pixel size of the sprite and doesnt squish it
+      32
     );
 
     this.animate();

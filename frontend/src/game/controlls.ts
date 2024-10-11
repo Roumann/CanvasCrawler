@@ -5,6 +5,7 @@ export class Controlls {
   player: Player;
   pressedKeys: Set<string>;
   keyMap: { [key: string]: string };
+  walls: any;
 
   constructor(player: Player) {
     this.player = player;
@@ -39,6 +40,7 @@ export class Controlls {
       return;
     }
 
+    //TODO do i want it like this?????
     this.pressedKeys.forEach((direction) => this.movePlayer(direction));
   }
 
@@ -50,7 +52,7 @@ export class Controlls {
         this.player.position.x = clamp(
           this.player.position.x - this.player.speed,
           0,
-          3200 - this.player.size.x
+          1600 - this.player.size.x
         );
         break;
       case "right":
@@ -59,7 +61,7 @@ export class Controlls {
         this.player.position.x = clamp(
           this.player.position.x + this.player.speed,
           0,
-          3200 - this.player.size.x
+          1600 - this.player.size.x
         );
         break;
       case "up":
@@ -68,7 +70,7 @@ export class Controlls {
         this.player.position.y = clamp(
           this.player.position.y - this.player.speed,
           0,
-          3200 - this.player.size.y
+          1600 - this.player.size.y
         );
         break;
       case "down":
@@ -77,7 +79,7 @@ export class Controlls {
         this.player.position.y = clamp(
           this.player.position.y + this.player.speed,
           0,
-          3200 - this.player.size.y
+          1600 - this.player.size.y
         );
         break;
     }

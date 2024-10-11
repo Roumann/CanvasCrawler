@@ -9,6 +9,7 @@ export class Camera {
   y: number;
   playerPos: Vector2;
   worldBounds: any;
+
   constructor(player: Player, ctx: CanvasRenderingContext2D) {
     this.playerPos = player.position;
     this.x = player.position.x - ctx.canvas.width / 2;
@@ -16,7 +17,7 @@ export class Camera {
     this.ctx = ctx;
     this.worldBounds = {
       min: 0,
-      max: 3200,
+      max: 1600,
     };
   }
 

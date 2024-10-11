@@ -6,6 +6,7 @@ export class Game {
   ctx: CanvasRenderingContext2D;
   world: any;
   camera: Camera;
+
   constructor(ctx: CanvasRenderingContext2D) {
     this.ctx = ctx;
     this.gameObjects = [];
@@ -31,7 +32,7 @@ export class Game {
   render() {
     this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
 
-    this.world.map.draw(this.ctx, this.camera);
+    this.world.map.draw(this.ctx, this.camera, this.world.gameObjects.player);
 
     this.gameObjects.forEach((gameObject: any) => {
       gameObject.sprite.draw(this.ctx, this.camera);
