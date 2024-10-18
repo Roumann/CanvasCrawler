@@ -30,7 +30,7 @@ const overworld = new Scene({
 });
 
 // Add single systems to scene
-overworld.systemManager.addSystem(new MovementSystem());
+overworld.systemManager.addSystem(new MovementSystem(canvas));
 // Add multiple systems to scene
 overworld.systemManager.addSystems([new CollisionSystem(), new DrawSystem()]);
 
@@ -54,8 +54,8 @@ world.addScene(overworld);
 
 // Create entity manager and systems
 const entityManager = new EntityManager();
-const movementSystem = new MovementSystem();
-// const collisionSystem = new CollisionSystem();
+const movementSystem = new MovementSystem(canvas);
+const collisionSystem = new CollisionSystem();
 const drawSystem = new DrawSystem();
 
 const map = entityManager.createEntity();
@@ -70,7 +70,6 @@ walls.forEach((wall) => {
     .addComponent(new PositionComponent(wall.x, wall.y))
     .addComponent(new SizeComponent(wall.width, wall.height))
     .addComponent(new TileComponent({ type: "wall" }));
-  // .addComponent(new SpriteComponent({ src: "/characters/char_4.png" }));
 });
 
 // Create a player entity with components
@@ -102,14 +101,13 @@ function gameLoop(timestamp: number) {
     deltaTime
   );
 
-  // collisionSystem.update(
-  //   entityManager.getEntitiesWithComponents([
-  //     "PositionComponent",
-  //     "VelocityComponent",
-  //     "SizeComponent",
-  //   ]),
-  //   entityManager.getEntitiesWithComponents(["TileComponent"])
-  // );
+  collisionSystem.update(
+    entityManager.getEntitiesWithComponentsExcl(
+      ["PositionComponent", "VelocityComponent", "SizeComponent"],
+      ["TileComponent"]
+    ),
+    entityManager.getEntitiesWithComponents(["TileComponent"])
+  );
 
   // draw system
   drawSystem.debug = true;

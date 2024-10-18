@@ -1,6 +1,6 @@
 import { PositionComponent } from "../components/Position";
 import { SizeComponent } from "../components/Size";
-import { WallComponent } from "../components/Wall";
+
 import { Entity } from "../core/Entity";
 
 export class CollisionSystem {
@@ -12,11 +12,13 @@ export class CollisionSystem {
       if (!position || !size) return;
 
       wallEntities.forEach((wallEntity) => {
-        const wall = wallEntity.getComponent("WallComponent");
-        if (!wall) return;
+        const wallSize = wallEntity.getComponent("SizeComponent");
+        const wallPosition = wallEntity.getComponent("PositionComponent");
 
-        if (this.isColliding(position, size, wall)) {
-          this.resolveCollision(position, size, wall);
+        if (!wallSize || !wallPosition) return;
+
+        if (this.isColliding(position, size, wallSize, wallPosition)) {
+          this.resolveCollision(position, size, wallSize, wallPosition);
         }
       });
     });
@@ -25,43 +27,47 @@ export class CollisionSystem {
   isColliding(
     position: PositionComponent,
     size: SizeComponent,
-    wall: WallComponent
+    wallSize: SizeComponent,
+    wallPosition: PositionComponent
   ) {
     return (
-      position.x < wall.x + wall.w &&
-      position.x + size.w > wall.x &&
-      position.y < wall.y + wall.h &&
-      position.y + size.h > wall.y
+      position.x < wallPosition.x + wallSize.w &&
+      position.x + size.w > wallPosition.x &&
+      position.y < wallPosition.y + wallSize.h &&
+      position.y + size.h > wallPosition.y
     );
   }
 
   resolveCollision(
     position: PositionComponent,
     size: SizeComponent,
-    wall: WallComponent
+    wallSize: SizeComponent,
+    wallPosition: PositionComponent
   ) {
     //Calculate the overlap from center of the object to the center of the wall
-    const overlapX = position.x + size.w / 2 - (wall.x + wall.w / 2);
-    const overlapY = position.y + size.h / 2 - (wall.y + wall.h / 2);
+    const overlapX =
+      position.x + size.w / 2 - (wallPosition.x + wallSize.w / 2);
+    const overlapY =
+      position.y + size.h / 2 - (wallPosition.y + wallSize.h / 2);
 
     // Resolve the collision based on the movement direction
     if (Math.abs(overlapX) > Math.abs(overlapY)) {
       // Horizontal collision
       if (overlapX > 0) {
         // Player is to the right of the wall
-        position.x = wall.x + wall.w; // Move player to the right of the wall
+        position.x = wallPosition.x + wallSize.w; // Move player to the right of the wall
       } else {
         // Player is to the left of the wall
-        position.x = wall.x - size.w; // Move player to the left of the wall
+        position.x = wallPosition.x - size.w; // Move player to the left of the wall
       }
     } else {
       // Vertical collision
       if (overlapY > 0) {
         // Player is below the wall
-        position.y = wall.y + wall.h; // Move player below the wall
+        position.y = wallPosition.y + wallSize.h; // Move player below the wall
       } else {
         // Player is above the wall
-        position.y = wall.y - size.h; // Move player above the wall
+        position.y = wallPosition.y - size.h; // Move player above the wall
       }
     }
   }

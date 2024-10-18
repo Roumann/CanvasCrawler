@@ -1,16 +1,20 @@
 import { Entity } from "../core/Entity";
+import { Rect } from "../utils/Rect";
 
 export class MovementSystem {
   left: boolean;
   right: boolean;
   up: boolean;
   down: boolean;
+  bounds: Rect;
 
-  constructor() {
+  constructor(canvas: HTMLCanvasElement) {
     this.left = false;
     this.right = false;
     this.up = false;
     this.down = false;
+
+    this.bounds = new Rect(0, 0, canvas.width, canvas.height);
 
     this.addEventListeners();
   }
@@ -65,11 +69,11 @@ export class MovementSystem {
       if (position.y < 0) {
         position.y = 0;
       }
-      if (position.x > 196) {
-        position.x = 196; // canvas width create global variable
+      if (position.x > this.bounds.w - 32) {
+        position.x = this.bounds.w - 32; // canvas width create global variable
       }
-      if (position.y > 196) {
-        position.y = 196; // canvas height
+      if (position.y > this.bounds.h - 32) {
+        position.y = this.bounds.h - 32; // canvas height
       }
 
       if (this.left) {
