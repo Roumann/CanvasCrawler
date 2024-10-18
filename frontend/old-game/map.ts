@@ -1,7 +1,7 @@
 import { Camera } from "./camera";
 import { MapObject } from "../../public/maps/map_3";
 
-export class World {
+export class Map {
   image: HTMLImageElement;
   isLoaded: boolean = false;
   walls: any;

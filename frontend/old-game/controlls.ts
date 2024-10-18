@@ -15,6 +15,7 @@ export class Controlls {
       ArrowRight: "right",
       ArrowUp: "up",
       ArrowDown: "down",
+      x: "attack",
     };
 
     this.addEventListeners();

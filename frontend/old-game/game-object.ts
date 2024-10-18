@@ -20,7 +20,6 @@ export class GameObject {
   constructor({
     position,
     size,
-
     src,
     animationMap,
     currentAnimation,

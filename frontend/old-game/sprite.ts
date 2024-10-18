@@ -62,10 +62,16 @@ export class Sprite {
 
     const [frameX, frameY] = this.frame;
 
-    // Draw box around the sprite
-    // ctx.strokeRect(cameraX, cameraY, 16, 16);
+    // Draw hitBox around the sprite
+    // ctx.strokeRect(
+    //   cameraX,
+    //   cameraY,
+    //   this.gameObject.size.x,
+    //   this.gameObject.size.y
+    // );
 
     ctx.imageSmoothingEnabled = false;
+    //This assumes all sprites are 32x32 pixels
     ctx.drawImage(
       this.image,
       frameX * 32, // Sprites are 32x32 pixels

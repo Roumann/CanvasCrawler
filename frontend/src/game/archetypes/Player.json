@@ -1,0 +1,24 @@
+{
+  "name": "Player",
+  "components": {
+    "PositionComponent": {
+      "x": 100,
+      "y": 150
+    },
+    "SizeComponent": {
+      "w": 32,
+      "h": 32
+    },
+    "VelocityComponent": {
+      "vx": 120,
+      "vy": 120
+    },
+    "HealthComponent": {
+      "current": 100,
+      "max": 100
+    },
+    "SpriteComponent": {
+      "src": "/characters/char_4.png"
+    }
+  }
+}

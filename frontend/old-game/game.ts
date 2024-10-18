@@ -1,5 +1,7 @@
 import { level1 } from "../levels/level-1";
 import { Camera } from "./camera";
+import { GameObject } from "./game-object";
+import { Player } from "./player";
 
 export class Game {
   gameObjects: any;
@@ -22,7 +24,7 @@ export class Game {
   }
 
   update() {
-    this.gameObjects.forEach((gameObject: any) => {
+    this.gameObjects.forEach((gameObject: GameObject) => {
       gameObject.update();
     });
 
@@ -36,10 +38,18 @@ export class Game {
 
     this.gameObjects.forEach((gameObject: any) => {
       gameObject.sprite.draw(this.ctx, this.camera);
+
+      // if (gameObject instanceof Player) {
+      //   gameObject.weapon.sprite.draw(this.ctx, this.camera); // Draw the player's weapon
+      // }
     });
   }
 
   addChild(gameObject: any) {
     this.gameObjects.push(gameObject);
+  }
+
+  removeChild(gameObject: any) {
+    this.gameObjects.splice(this.gameObjects.indexOf(gameObject), 1);
   }
 }
