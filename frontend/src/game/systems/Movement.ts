@@ -1,6 +1,3 @@
-import { PositionComponent } from "../components/Position";
-import { VelocityComponent } from "../components/Velocity";
-import { WallComponent } from "../components/Wall";
 import { Entity } from "../core/Entity";
 
 export class MovementSystem {

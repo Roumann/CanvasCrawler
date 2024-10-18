@@ -1,12 +1,17 @@
 import { EntityManager } from "../managers/EntityManager";
 import { SystemManager } from "../managers/SystemManager";
 
+export type IScene = {
+  name: string;
+};
+
 export class Scene {
   entityManager: EntityManager;
   systemManager: SystemManager;
+
   name: string;
 
-  constructor(name: string) {
+  constructor({ name }: IScene) {
     this.name = name;
     this.entityManager = new EntityManager();
     this.systemManager = new SystemManager();
