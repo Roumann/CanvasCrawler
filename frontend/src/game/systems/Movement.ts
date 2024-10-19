@@ -1,20 +1,25 @@
 import { Entity } from "../core/Entity";
+import { System } from "../core/System";
+import { clamp } from "../utils/clamp";
 import { Rect } from "../utils/Rect";
 
-export class MovementSystem {
+export class MovementSystem extends System {
   left: boolean;
   right: boolean;
   up: boolean;
   down: boolean;
   bounds: Rect;
+  context: CanvasRenderingContext2D | null;
 
-  constructor(canvas: HTMLCanvasElement) {
+  constructor(ctx: CanvasRenderingContext2D | null) {
+    super();
     this.left = false;
     this.right = false;
     this.up = false;
     this.down = false;
 
-    this.bounds = new Rect(0, 0, canvas.width, canvas.height);
+    this.context = ctx ?? null;
+    this.bounds = new Rect(0, 0, 3200, 3200);
 
     this.addEventListeners();
   }
@@ -60,21 +65,9 @@ export class MovementSystem {
     entities.forEach((entity) => {
       const position = entity.getComponent("PositionComponent");
       const velocity = entity.getComponent("VelocityComponent");
+      const size = entity.getComponent("SizeComponent");
 
-      if (!position || !velocity) return;
-
-      if (position.x < 0) {
-        position.x = 0;
-      }
-      if (position.y < 0) {
-        position.y = 0;
-      }
-      if (position.x > this.bounds.w - 32) {
-        position.x = this.bounds.w - 32; // canvas width create global variable
-      }
-      if (position.y > this.bounds.h - 32) {
-        position.y = this.bounds.h - 32; // canvas height
-      }
+      if (!position || !velocity || !size || !this.context) return;
 
       if (this.left) {
         position.x -= velocity.vx * deltaTime;
@@ -88,6 +81,9 @@ export class MovementSystem {
       if (this.down) {
         position.y += velocity.vy * deltaTime;
       }
+
+      position.x = clamp(position.x, 0, this.bounds.w - size.w);
+      position.y = clamp(position.y, 0, this.bounds.h - size.h);
     });
   }
 }

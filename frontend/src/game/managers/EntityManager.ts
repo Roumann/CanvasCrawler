@@ -39,3 +39,46 @@ export class EntityManager {
     });
   }
 }
+
+// TODO like this
+// const query = world.createQuery({
+//   any: [A, B], // exclude any entity that does not have at least one of A OR B.
+//   all: [C, D], // exclude entities that don't have both C AND D
+//   none: [E, F], // exclude entities that have E OR F
+// });
+
+// If Entity doesnt have one the passed in values it gets exluded. Entitis with all passed in values and extra will be also returned
+// function exludeIfNotOneOf() {
+//   const keep = ["Position", "Size"];
+//   let res = [];
+
+//   for (let i = 0; i < entitis.length; i++) {
+//     for (let k = 0; k < keep.length; k++) {
+//       if (entitis[i].has(keep[k])) {
+//         res.push(entitis[i]);
+//       }
+//     }
+//   }
+
+//   return res;
+// }
+
+// If Entity doesnt have one the passed in values it gets exluded. Entitis with all passed in values and extra will be also returned
+// function test() {
+//   const keep = ["Position", "Size"];
+//   const exclude = ["Position"];
+//   let res = [];
+
+//   for (let i = 0; i < entitis.length; i++) {
+//     for (let k = 0; k < keep.length; k++) {
+//       if (entitis[i].has(exclude[k])) {
+//         break;
+//       }
+//       if (entitis[i].has(keep[k])) {
+//         res.push(entitis[i]);
+//       }
+//     }
+//   }
+
+//   return res;
+// }

@@ -2,8 +2,9 @@ import { PositionComponent } from "../components/Position";
 import { SizeComponent } from "../components/Size";
 
 import { Entity } from "../core/Entity";
+import { System } from "../core/System";
 
-export class CollisionSystem {
+export class CollisionSystem extends System {
   update(entities: Entity[], wallEntities: Entity[]) {
     entities.forEach((entity) => {
       const position = entity.getComponent("PositionComponent");

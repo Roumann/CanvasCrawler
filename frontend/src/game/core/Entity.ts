@@ -13,7 +13,11 @@ export class Entity {
     return this;
   }
 
-  getComponent(componentName: string) {
-    return this.components.get(componentName);
+  getComponent(component: string) {
+    return this.components.get(component);
+  }
+
+  hasComponent(component: string) {
+    return this.components.has(component);
   }
 }
