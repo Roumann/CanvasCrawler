@@ -9,6 +9,12 @@ export class SystemManager {
     this.nextId = 1;
   }
 
+  update() {
+    this.systems.forEach((system) => {
+      system.update();
+    });
+  }
+
   addSystem(system: System) {
     this.systems.push(system);
   }

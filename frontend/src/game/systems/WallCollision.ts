@@ -4,7 +4,7 @@ import { SizeComponent } from "../components/Size";
 import { Entity } from "../core/Entity";
 import { System } from "../core/System";
 
-export class CollisionSystem extends System {
+export class WallCollisionSystem extends System {
   update(entities: Entity[], wallEntities: Entity[]) {
     entities.forEach((entity) => {
       const position = entity.getComponent("PositionComponent");

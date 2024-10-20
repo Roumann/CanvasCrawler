@@ -15,6 +15,16 @@ export class Scene {
     this.name = name;
     this.entityManager = new EntityManager();
     this.systemManager = new SystemManager();
+    // maybe create render manager separetly?
+  }
+
+  update() {
+    this.systemManager.update();
+  }
+
+  // maybe create render manager separetly?
+  render() {
+    // this.systemManager.render();
   }
 }
 

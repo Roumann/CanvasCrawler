@@ -38,6 +38,10 @@ export class Game {
   start() {
     // Main gameloop here
     // loop through current scene and run everything systems, updates, renders etc.
+
+    this.currentScene?.update();
+
+    this.currentScene?.render();
   }
 
   addScene(scene: Scene) {

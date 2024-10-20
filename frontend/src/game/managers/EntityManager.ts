@@ -15,6 +15,12 @@ export class EntityManager {
     return entity;
   }
 
+  getEntitiesByTag(tag: string) {
+    return this.entities.filter((entity) => {
+      const tagComponent = entity.getComponent("TagComponent");
+      return tagComponent && tagComponent.tag === tag;
+    });
+  }
   getEntitiesWithComponents(componentNames: string[]) {
     return this.entities.filter((entity) => {
       return componentNames.some((componentName) => {

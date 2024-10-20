@@ -7,7 +7,7 @@ import { Camera } from "./game/core/Camera";
 import { Game } from "./game/core/Game";
 import { Scene } from "./game/core/Scene";
 
-import { CollisionSystem } from "./game/systems/CollisionSystem";
+import { WallCollisionSystem } from "./game/systems/WallCollision";
 import { MovementSystem } from "./game/systems/Movement";
 import { RenderSystem } from "./game/systems/RenderSystem";
 
@@ -28,8 +28,12 @@ const overworld = new Scene({
   name: "overworld",
 });
 
+// Its an array, order of systems matters
 overworld.systemManager.addSystem(new MovementSystem(ctx));
-overworld.systemManager.addSystems([new CollisionSystem(), new RenderSystem()]);
+overworld.systemManager.addSystems([
+  new WallCollisionSystem(),
+  new RenderSystem(),
+]);
 
 const player = overworld.entityManager.createEntity();
 player
