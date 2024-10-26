@@ -1,29 +1,31 @@
 import { CollisionDamageComponent } from "../components/CollisionDamage";
 import { HealthComponent } from "../components/Health";
 import { PositionComponent } from "../components/Position";
-import { SizeComponent } from "../components/Size";
+import { ColliderComponent } from "../components/Collider";
 import { SpriteComponent } from "../components/Sprite";
-import { SpriteOffsetComponent } from "../components/SpriteOffset";
 import { TagComponent } from "../components/Tag";
-
-import { Entity } from "../core/Entity";
 import { System } from "../core/System";
-import { EntityManager } from "../managers/EntityManager";
 
 export class EnemyCollisionSystem extends System {
-  update(
-    player: Entity,
-    enemyEntities: Entity[],
-    entityManager: EntityManager
-  ) {
+  constructor() {
+    super();
+  }
+
+  update(deltaTime: number) {
+    if (!this.entityManager) return;
+
+    const player = this.entityManager.getEntitiesByTag("player")[0];
+    const enemyEntities = this.entityManager.getEntitiesByTag("enemy");
+
+    // TODO FIX THIS
     const position = player.getComponent("PositionComponent");
-    const size = player.getComponent("SizeComponent");
+    const size = player.getComponent("ColliderComponent");
     const health = player.getComponent("HealthComponent");
 
     if (!position || !size || !health) return;
 
     enemyEntities.forEach((enemyEntity) => {
-      const enemySize = enemyEntity.getComponent("SizeComponent");
+      const enemySize = enemyEntity.getComponent("ColliderComponent");
       const enemyPos = enemyEntity.getComponent("PositionComponent");
       const damage = enemyEntity.getComponent("CollisionDamageComponent");
       const enemyId = enemyEntity.id;
@@ -31,15 +33,15 @@ export class EnemyCollisionSystem extends System {
       if (!enemySize || !enemyPos || !damage) return;
 
       if (this.isColliding(position, size, enemySize, enemyPos)) {
-        this.resolveCollision(health, damage, entityManager, enemyPos, enemyId);
+        this.resolveCollision(health, damage, enemyPos, enemyId);
       }
     });
   }
 
   isColliding(
     position: PositionComponent,
-    size: SizeComponent,
-    wallSize: SizeComponent,
+    size: ColliderComponent,
+    wallSize: ColliderComponent,
     wallPosition: PositionComponent
   ) {
     return (
@@ -53,7 +55,6 @@ export class EnemyCollisionSystem extends System {
   resolveCollision(
     health: HealthComponent,
     collDmg: CollisionDamageComponent,
-    entityManager: EntityManager,
     enemyPos: PositionComponent,
     enemyId: number
   ) {
@@ -61,16 +62,18 @@ export class EnemyCollisionSystem extends System {
 
     // SYSTEM DOESNT DELET ENTITIES - ONLY MARKS THEM FOR DELETION
     // ADD ISALIVE TAG TO ENTITY AFTER RENDER IF FLAG FALSE = DELETE IT
+    if (!this.entityManager) return;
+
     console.log(health.health);
     if (health.health === -500) {
-      entityManager
+      this.entityManager
         .createEntity()
         .addComponent(new PositionComponent({ x: enemyPos.x, y: enemyPos.y }))
-        .addComponent(new SizeComponent({ w: 32, h: 32 }))
+        .addComponent(new ColliderComponent({ w: 32, h: 32 }))
         .addComponent(new SpriteComponent({ src: "/items/gem.png" }))
         .addComponent(new TagComponent({ tag: "drop" }));
 
-      entityManager.removeEntityById(enemyId);
+      this.entityManager.removeEntityById(enemyId);
       health.health = 100;
     }
   }

@@ -20,6 +20,7 @@ export class Game {
   camera: Camera | null;
 
   isPaused: boolean;
+  lastTime: number;
 
   constructor({ currentScene, width, height, isPaused, context }: TWorld) {
     this.context = context ?? null;
@@ -33,18 +34,23 @@ export class Game {
     this.isPaused = isPaused ?? false;
     // add time managment here
     // timeElapsed etc.
+    this.lastTime = 0;
   }
 
-  start() {
-    // Main gameloop here
-    // loop through current scene and run everything systems, updates, renders etc.
+  start(deltaTime: number) {
+    if (this.isPaused || !this.context) return;
 
-    this.currentScene?.update();
+    this.currentScene?.update(deltaTime);
+
+    this.camera?.update();
 
     this.currentScene?.render();
   }
 
   addScene(scene: Scene) {
+    if (this.currentScene === null) {
+      this.currentScene = scene;
+    }
     this.scenes.set(scene.name, scene);
   }
 

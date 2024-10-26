@@ -1,4 +1,4 @@
-import { gemAnimations, GemAnimations } from "../animations/gem";
+import { gemAnimations, GemAnimations } from "../../src/animations/gem";
 import { GameObject } from "../old-game/game-object";
 import { Player } from "../old-game/player";
 import { withGrid } from "../old-game/utils";

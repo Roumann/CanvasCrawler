@@ -1,5 +1,5 @@
 import { PositionComponent } from "./Position";
-import { SizeComponent } from "./Size";
+import { ColliderComponent } from "./Collider";
 import { SpriteComponent } from "./Sprite";
 
 export type TWeaponComponent = {
@@ -13,17 +13,18 @@ export class WeaponComponent {
   range: number;
   sprite: SpriteComponent;
   position: PositionComponent;
-  size: SizeComponent;
+  collider: ColliderComponent;
 
   constructor({ damage, range, src }: TWeaponComponent) {
     this.damage = damage;
     this.range = range;
-    this.sprite = new SpriteComponent({ src: src ?? "/items/sword.png" });
+    this.sprite = new SpriteComponent({
+      src: src ?? "/items/sword.png",
+      size: { w: 64, h: 64 },
+    });
     this.position = new PositionComponent({ x: 0, y: 0 });
-    this.size = new SizeComponent({ w: 64, h: 64 });
+    this.collider = new ColliderComponent({ w: 64, h: 64 });
   }
 
-  attack() {
-    console.log("attack");
-  }
+  attack() {}
 }

@@ -14,17 +14,17 @@ export class Scene {
   constructor({ name }: TScene) {
     this.name = name;
     this.entityManager = new EntityManager();
-    this.systemManager = new SystemManager();
+    this.systemManager = new SystemManager(this.entityManager);
     // maybe create render manager separetly?
   }
 
-  update() {
-    this.systemManager.update();
+  update(deltaTime: number) {
+    this.systemManager.update(deltaTime);
   }
 
   // maybe create render manager separetly?
   render() {
-    // this.systemManager.render();
+    //  this.systemManager.render();
   }
 }
 

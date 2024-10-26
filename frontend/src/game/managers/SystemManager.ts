@@ -1,21 +1,23 @@
 import { System } from "../core/System";
+import { EntityManager } from "./EntityManager";
 
 export class SystemManager {
   systems: System[];
   nextId: number;
 
-  constructor() {
+  constructor(private entityManager: EntityManager) {
     this.systems = [];
     this.nextId = 1;
   }
 
-  update() {
+  update(deltaTime: number) {
     this.systems.forEach((system) => {
-      system.update();
+      system.update(deltaTime);
     });
   }
 
   addSystem(system: System) {
+    system.setEntityManager(this.entityManager);
     this.systems.push(system);
   }
 

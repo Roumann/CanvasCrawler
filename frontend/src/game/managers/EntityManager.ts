@@ -25,6 +25,7 @@ export class EntityManager {
       return tagComponent && tagComponent.tag === tag;
     });
   }
+
   getEntitiesWithComponents(componentNames: string[]) {
     return this.entities.filter((entity) => {
       return componentNames.some((componentName) => {

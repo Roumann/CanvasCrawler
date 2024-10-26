@@ -61,11 +61,18 @@ export class MovementSystem extends System {
   }
 
   // TODO change the velocity instead of position
-  update(entities: Entity[], deltaTime: number) {
+  update(deltaTime: number) {
+    if (!this.entityManager) return;
+
+    const entities = this.entityManager.getEntitiesWithComponentsExcl(
+      ["PositionComponent", "VelocityComponent", "SpriteOffsetComponent"],
+      ["TileComponent"]
+    );
+
     entities.forEach((entity) => {
       const position = entity.getComponent("PositionComponent");
       const velocity = entity.getComponent("VelocityComponent");
-      const size = entity.getComponent("SizeComponent");
+      const size = entity.getComponent("ColliderComponent");
 
       if (!position || !velocity || !size || !this.context) return;
 

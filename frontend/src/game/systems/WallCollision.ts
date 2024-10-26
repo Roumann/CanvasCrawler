@@ -1,19 +1,21 @@
 import { PositionComponent } from "../components/Position";
-import { SizeComponent } from "../components/Size";
-
-import { Entity } from "../core/Entity";
+import { ColliderComponent } from "../components/Collider";
 import { System } from "../core/System";
 
 export class WallCollisionSystem extends System {
-  update(entities: Entity[], wallEntities: Entity[]) {
+  update(deltaTime: number) {
+    if (!this.entityManager) return;
+    const entities = this.entityManager.getEntitiesByTag("player");
+    const wallEntities = this.entityManager.getEntitiesByTag("wall");
+
     entities.forEach((entity) => {
       const position = entity.getComponent("PositionComponent");
-      const size = entity.getComponent("SizeComponent");
+      const size = entity.getComponent("ColliderComponent");
 
       if (!position || !size) return;
 
       wallEntities.forEach((wallEntity) => {
-        const wallSize = wallEntity.getComponent("SizeComponent");
+        const wallSize = wallEntity.getComponent("ColliderComponent");
         const wallPosition = wallEntity.getComponent("PositionComponent");
 
         if (!wallSize || !wallPosition) return;
@@ -27,8 +29,8 @@ export class WallCollisionSystem extends System {
 
   isColliding(
     position: PositionComponent,
-    size: SizeComponent,
-    wallSize: SizeComponent,
+    size: ColliderComponent,
+    wallSize: ColliderComponent,
     wallPosition: PositionComponent
   ) {
     return (
@@ -41,8 +43,8 @@ export class WallCollisionSystem extends System {
 
   resolveCollision(
     position: PositionComponent,
-    size: SizeComponent,
-    wallSize: SizeComponent,
+    size: ColliderComponent,
+    wallSize: ColliderComponent,
     wallPosition: PositionComponent
   ) {
     //Calculate the overlap from center of the object to the center of the wall
