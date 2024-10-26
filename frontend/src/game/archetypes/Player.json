@@ -1,24 +1,45 @@
 {
   "name": "Player",
-  "components": {
-    "PositionComponent": {
-      "x": 100,
-      "y": 150
+  "components": [
+    {
+      "name": "PositionComponent",
+      "data": {
+        "x": 100,
+        "y": 150
+      }
     },
-    "SizeComponent": {
-      "w": 32,
-      "h": 32
+    {
+      "name": "SizeComponent",
+      "data": {
+        "w": 32,
+        "h": 32
+      }
     },
-    "VelocityComponent": {
-      "vx": 120,
-      "vy": 120
+    {
+      "name": "VelocityComponent",
+      "data": {
+        "vx": 120,
+        "vy": 120
+      }
     },
-    "HealthComponent": {
-      "current": 100,
-      "max": 100
+    {
+      "name": "HealthComponent",
+      "data": {
+        "current": 100,
+        "max": 100
+      }
     },
-    "SpriteComponent": {
-      "src": "/characters/char_4.png"
+    {
+      "name": "SpriteComponent",
+      "data": {
+        "src": "/characters/char_4.png"
+      }
+    },
+    {
+      "name": "TagComponent",
+      "data": {
+        "tag": "player"
+      }
     }
-  }
+  ]
 }

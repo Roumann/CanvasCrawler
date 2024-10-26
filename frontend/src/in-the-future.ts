@@ -28,6 +28,7 @@ const overworld = new Scene({
   name: "overworld",
 });
 
+// System should have access to entity manager
 // Its an array, order of systems matters
 overworld.systemManager.addSystem(new MovementSystem(ctx));
 overworld.systemManager.addSystems([
@@ -37,10 +38,10 @@ overworld.systemManager.addSystems([
 
 const player = overworld.entityManager.createEntity();
 player
-  .addComponent(new PositionComponent(10, 10))
-  .addComponent(new SizeComponent(32, 32))
-  .addComponent(new VelocityComponent(120, 120))
-  .addComponent(new HealthComponent(100, 100))
+  .addComponent(new PositionComponent({ x: 10, y: 10 }))
+  .addComponent(new SizeComponent({ w: 32, h: 32 }))
+  .addComponent(new VelocityComponent({ vx: 120, vy: 120 }))
+  .addComponent(new HealthComponent({ health: 100, maxHealth: 100 }))
   .addComponent(new SpriteComponent({ src: "/characters/char_4.png" }));
 
 game.addScene(overworld);
@@ -56,5 +57,7 @@ const camera = new Camera({
 game.addCamera(camera);
 
 game.start();
+
+// game.pause(); Pause game - Settings / Level up screen etc.
 
 /* -------------------------------------------------------------------------------------- */

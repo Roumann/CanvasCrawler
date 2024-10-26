@@ -1,7 +1,7 @@
 import { clamp } from "../utils/clamp";
 import { Entity } from "./Entity";
 
-export type ICamera = {
+export type TCamera = {
   x: number;
   y: number;
   width: number;
@@ -20,7 +20,7 @@ export class Camera {
   context: CanvasRenderingContext2D | null;
   followEntity: Entity;
 
-  constructor({ x, y, width, height, context, follow }: ICamera) {
+  constructor({ x, y, width, height, context, follow }: TCamera) {
     this.x = x;
     this.y = y;
     this.width = width;

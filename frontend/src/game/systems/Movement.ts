@@ -19,7 +19,7 @@ export class MovementSystem extends System {
     this.down = false;
 
     this.context = ctx ?? null;
-    this.bounds = new Rect(0, 0, 3200, 3200);
+    this.bounds = new Rect({ x: 0, y: 0, w: 3200, h: 3200 });
 
     this.addEventListeners();
   }

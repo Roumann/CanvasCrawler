@@ -1,3 +1,5 @@
+import { Component } from "./Component";
+
 export class Entity {
   id: number;
   components: Map<string, any>;
@@ -5,10 +7,13 @@ export class Entity {
   constructor(id: number) {
     this.id = id;
     this.components = new Map();
+
+    // SYSTEM DOESNT DELET ENTITIES - ONLY MARKS THEM FOR DELETION
+    // ADD ISALIVE TAG TO ENTITY AFTER RENDER IF FLAG FALSE = DELETE IT
     // this.isAlive = true;
   }
 
-  addComponent(component: any) {
+  addComponent(component: Component) {
     this.components.set(component.constructor.name, component);
     return this;
   }

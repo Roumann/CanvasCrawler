@@ -1,13 +1,13 @@
 import { SpriteComponent } from "../components/Sprite";
 
-export type IMap2D = {
+export type TMap2D = {
   bgPath: string;
 };
 
 export class Map2D {
   background: SpriteComponent;
 
-  constructor({ bgPath }: IMap2D) {
+  constructor({ bgPath }: TMap2D) {
     this.background = new SpriteComponent({ src: bgPath });
   }
 }

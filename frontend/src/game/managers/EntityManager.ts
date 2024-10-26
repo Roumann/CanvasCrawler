@@ -5,8 +5,12 @@ export class EntityManager {
   nextId: number;
 
   constructor() {
+    // SYSTEM DOESNT DELET ENTITIES - ONLY MARKS THEM FOR DELETION
+    // ADD ISALIVE TAG TO ENTITY AFTER RENDER IF FLAG FALSE = DELETE IT
     this.entities = [];
     this.nextId = 1;
+
+    console.log(this.entities);
   }
 
   createEntity() {
@@ -42,6 +46,21 @@ export class EntityManager {
       return !exclude.some((componentName) => {
         return entity.components.has(componentName);
       });
+    });
+  }
+
+  removeEntityByTag(tag: string) {
+    this.entities = this.entities.filter((entity) => {
+      return (
+        !entity.hasComponent("TagComponent") ||
+        entity.getComponent("TagComponent").tag !== tag
+      );
+    });
+  }
+
+  removeEntityById(id: number) {
+    this.entities = this.entities.filter((entity) => {
+      return entity.id !== id;
     });
   }
 }

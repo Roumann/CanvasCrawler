@@ -1,19 +1,18 @@
 import { PassiveItemComponent } from "./PassiveItem";
 import { WeaponComponent } from "./Weapon";
 
+export type TInventoryComponent = {
+  weapons: WeaponComponent[];
+  passiveItems: PassiveItemComponent[];
+};
+
 export class InventoryComponent {
   weapons: WeaponComponent[];
   passiveItems: PassiveItemComponent[];
 
-  constructor(
-    weapons: WeaponComponent[],
-    passiveItems: PassiveItemComponent[]
-  ) {
+  constructor({ weapons, passiveItems }: TInventoryComponent) {
     this.weapons = [...weapons];
     this.passiveItems = [...passiveItems];
-
-    console.log(this.weapons);
-    console.log(this.passiveItems);
   }
 
   addWeapon(weapon: WeaponComponent) {

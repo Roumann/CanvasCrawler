@@ -1,7 +1,7 @@
 import { EntityManager } from "../managers/EntityManager";
 import { SystemManager } from "../managers/SystemManager";
 
-export type IScene = {
+export type TScene = {
   name: string;
 };
 
@@ -11,7 +11,7 @@ export class Scene {
 
   name: string;
 
-  constructor({ name }: IScene) {
+  constructor({ name }: TScene) {
     this.name = name;
     this.entityManager = new EntityManager();
     this.systemManager = new SystemManager();

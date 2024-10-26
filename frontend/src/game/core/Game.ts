@@ -1,7 +1,7 @@
 import { Camera } from "./Camera";
 import { Scene } from "./Scene";
 
-export type IWorld = {
+export type TWorld = {
   width: number;
   height: number;
   context: CanvasRenderingContext2D | null;
@@ -16,12 +16,12 @@ export class Game {
   height: number;
 
   scenes: Map<string, Scene>;
-  currentScene: Scene | null;
+  currentScene: Scene | null; // Automatically crate base scene if none is passed in
   camera: Camera | null;
 
   isPaused: boolean;
 
-  constructor({ currentScene, width, height, isPaused, context }: IWorld) {
+  constructor({ currentScene, width, height, isPaused, context }: TWorld) {
     this.context = context ?? null;
     this.width = width;
     this.height = height;
