@@ -1,10 +1,12 @@
-import { CollisionDamageComponent } from "../components/CollisionDamage";
-import { HealthComponent } from "../components/Health";
-import { PositionComponent } from "../components/Position";
-import { ColliderComponent } from "../components/Collider";
-import { SpriteComponent } from "../components/Sprite";
-import { TagComponent } from "../components/Tag";
-import { System } from "../core/System";
+import {
+  ColliderComponent,
+  CollisionDamageComponent,
+  HealthComponent,
+  PositionComponent,
+  SpriteComponent,
+  TagComponent,
+} from "../../components";
+import { System } from "../../core";
 
 export class EnemyCollisionSystem extends System {
   constructor() {

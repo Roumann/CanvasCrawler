@@ -21,6 +21,18 @@ export class SystemManager {
     this.systems.push(system);
   }
 
+  /**
+   * Adds new system to current scenes system manager.
+   *
+   * **Order of systems is important!**
+   *
+   * Systems are executed one by one in the order they are added.
+   *
+   * **Always add your render system last!**
+   *
+   * @param systems - Array of systems to add.
+   */
+
   addSystems(systems: System[]) {
     systems.forEach((system) => {
       this.addSystem(system);

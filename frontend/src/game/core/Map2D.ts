@@ -1,5 +1,6 @@
-import { SpriteComponent } from "../components/Sprite";
+import { SpriteComponent } from "../components/rendering/Sprite";
 
+// TODO Change how this works
 export type TMap2D = {
   bgPath: string;
 };

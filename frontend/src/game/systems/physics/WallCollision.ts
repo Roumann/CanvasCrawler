@@ -1,6 +1,5 @@
-import { PositionComponent } from "../components/Position";
-import { ColliderComponent } from "../components/Collider";
-import { System } from "../core/System";
+import { ColliderComponent, PositionComponent } from "../../components";
+import { System } from "../../core";
 
 export class WallCollisionSystem extends System {
   update(deltaTime: number) {

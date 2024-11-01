@@ -43,8 +43,6 @@ export class Game {
     this.currentScene?.update(deltaTime);
 
     this.camera?.update();
-
-    this.currentScene?.render();
   }
 
   addScene(scene: Scene) {

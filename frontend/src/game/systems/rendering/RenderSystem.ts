@@ -1,9 +1,10 @@
-import { ColliderComponent } from "../components/Collider";
-import { PositionComponent } from "../components/Position";
-import { SpriteComponent } from "../components/Sprite";
-import { SpriteOffsetComponent } from "../components/SpriteOffset";
-import { Camera } from "../core/Camera";
-import { System } from "../core/System";
+import {
+  ColliderComponent,
+  PositionComponent,
+  SpriteComponent,
+  SpriteOffsetComponent,
+} from "../../components";
+import { Camera, System } from "../../core";
 
 type TRenderSystem = {
   ctx: CanvasRenderingContext2D | null;

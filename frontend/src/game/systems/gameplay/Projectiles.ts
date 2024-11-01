@@ -1,4 +1,4 @@
-import { System } from "../core/System";
+import { System } from "../../core";
 
 export class ProjectileSystem extends System {
   constructor() {

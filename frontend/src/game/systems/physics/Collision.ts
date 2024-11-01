@@ -1,13 +1,33 @@
-import { ColliderComponent } from "../components/Collider";
-import { Entity } from "../core/Entity";
-import { System } from "../core/System";
-
 /**
  * Collision system
  * Handles collisions between collidable entities
  *
  * Merge my current setup to this one system
+ *
+ * get the player and every entity that has collider component
+ * check if the player is colliding with the entity
+ *
+ * if so, call the onCollision function
+ * in the onCollision function determine what type of entity it is
+ *
+ * if it is an enemy, call the onEnemyCollision function
+ * if it is a wall call the onWallCollision function
+ *
+ *  MAYBE BETTER VERSION
+ *
+ *  get all the collidable entities
+ *  loop through them
+ *  check if any of them are colliding
+ *  if so, call the onCollision function
+ *  onCollision function will push the entities away from each other so they dont overlap
+ *  check if entity has knockback component
+ *  if so, apply the knockback to the entity it is colliding with (if wall then ignore)
+ *
+ * Maybe add metadab to collider compoent - knockback, damage, etc
  */
+
+import { ColliderComponent } from "../../components";
+import { Entity, System } from "../../core";
 
 export class CollisionSystem extends System {
   constructor() {
@@ -55,7 +75,6 @@ export class CollisionSystem extends System {
     ) {
       this.applyEnemyWallCollision(entityA);
     }
-    // Additional collision types as needed...
   }
 
   applyProjectileEnemyCollision(projectile: Entity, enemy: Entity) {

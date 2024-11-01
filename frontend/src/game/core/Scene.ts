@@ -21,11 +21,6 @@ export class Scene {
   update(deltaTime: number) {
     this.systemManager.update(deltaTime);
   }
-
-  // maybe create render manager separetly?
-  render() {
-    //  this.systemManager.render();
-  }
 }
 
 /*

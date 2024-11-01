@@ -1,13 +1,15 @@
-import { ColliderComponent } from "../components/Collider";
-import { HealthComponent } from "../components/Health";
-import { InventoryComponent } from "../components/Inventory";
-import { PositionComponent } from "../components/Position";
-import { SpriteComponent } from "../components/Sprite";
-import { TagComponent } from "../components/Tag";
-import { WeaponComponent } from "../components/Weapon";
-import { Entity } from "../core/Entity";
-import { System } from "../core/System";
-import { EntityManager } from "../managers/EntityManager";
+import { ColliderComponent } from "../../components/physics/Collider";
+import { HealthComponent } from "../../components/gameplay/Health";
+
+import { PositionComponent } from "../../components/base/Position";
+import { SpriteComponent } from "../../components/rendering/Sprite";
+import { TagComponent } from "../../components/systems/Tag";
+
+import { Entity } from "../../core/Entity";
+import { System } from "../../core/System";
+import { EntityManager } from "../../managers/EntityManager";
+import { InventoryComponent } from "../../components";
+import { WeaponComponent } from "../../components/base/Weapon";
 
 export class PlayerAttackSystem extends System {
   attackTimer: number = 0;

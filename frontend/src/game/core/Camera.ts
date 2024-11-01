@@ -1,5 +1,5 @@
+import { Entity } from ".";
 import { clamp } from "../utils/clamp";
-import { Entity } from "./Entity";
 
 export type TCamera = {
   x: number;
@@ -53,7 +53,7 @@ export class Camera {
     // this.y = position.y;
   }
 
-  get postion() {
+  get position() {
     return { x: this.x, y: this.y };
   }
 

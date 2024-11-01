@@ -7,16 +7,21 @@ export class EntityManager {
   constructor() {
     // SYSTEM DOESNT DELET ENTITIES - ONLY MARKS THEM FOR DELETION
     // ADD ISALIVE TAG TO ENTITY AFTER RENDER IF FLAG FALSE = DELETE IT
-    this.entities = [];
+    this.entities = []; // maybe use new Set()
     this.nextId = 1;
-
-    console.log(this.entities);
   }
 
   createEntity() {
     const entity = new Entity(this.nextId++);
     this.entities.push(entity);
     return entity;
+  }
+
+  getEntityByTag(tag: string): Entity {
+    return this.entities.filter((entity) => {
+      const tagComponent = entity.getComponent("TagComponent");
+      return tagComponent && tagComponent.tag === tag;
+    })[0];
   }
 
   getEntitiesByTag(tag: string) {

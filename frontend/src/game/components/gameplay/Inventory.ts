@@ -1,5 +1,5 @@
+import { WeaponComponent } from "../base/Weapon";
 import { PassiveItemComponent } from "./PassiveItem";
-import { WeaponComponent } from "./Weapon";
 
 export type TInventoryComponent = {
   weapons: WeaponComponent[];

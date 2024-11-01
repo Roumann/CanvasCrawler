@@ -1,6 +1,6 @@
+import { ColliderComponent } from "../physics/Collider";
+import { SpriteComponent } from "../rendering/Sprite";
 import { PositionComponent } from "./Position";
-import { ColliderComponent } from "./Collider";
-import { SpriteComponent } from "./Sprite";
 
 export type TWeaponComponent = {
   damage: number;

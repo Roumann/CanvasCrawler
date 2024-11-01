@@ -1,30 +1,35 @@
-import { HealthComponent } from "./game/components/Health";
-import { PositionComponent } from "./game/components/Position";
-import { ColliderComponent } from "./game/components/Collider";
-import { SpriteComponent } from "./game/components/Sprite";
-import { SpriteOffsetComponent } from "./game/components/SpriteOffset";
-import { TagComponent } from "./game/components/Tag";
-import { TileComponent } from "./game/components/Tile";
-import { VelocityComponent } from "./game/components/Velocity";
-import { Camera } from "./game/core/Camera";
-import { WallCollisionSystem } from "./game/systems/WallCollision";
-import { MovementSystem } from "./game/systems/Movement";
-import { RenderSystem } from "./game/systems/RenderSystem";
+import { Camera, Game, Scene } from "./game/core";
 
-import walls from "./map/mapa_1.json";
-import { EnemyCollisionSystem } from "./game/systems/EnemyCollision";
-import { CollisionDamageComponent } from "./game/components/CollisionDamage";
-import { InventoryComponent } from "./game/components/Inventory";
-import { WeaponComponent } from "./game/components/Weapon";
-import { PassiveItemComponent } from "./game/components/PassiveItem";
-import { PlayerAttackSystem } from "./game/systems/PlayerAttack";
-import { ProjectileCollisionSystem } from "./game/systems/ProjectileCollision";
-import { Game } from "./game/core/Game";
-import { Scene } from "./game/core/Scene";
+import {
+  EnemyCollisionSystem,
+  MovementSystem,
+  PlayerAttackSystem,
+  ProjectileCollisionSystem,
+  RenderSystem,
+  WallCollisionSystem,
+} from "./game/systems";
+
+import {
+  ColliderComponent,
+  CollisionDamageComponent,
+  HealthComponent,
+  InventoryComponent,
+  PassiveItemComponent,
+  PositionComponent,
+  SpriteComponent,
+  SpriteOffsetComponent,
+  TagComponent,
+  TileComponent,
+  VelocityComponent,
+  WeaponComponent,
+} from "./game/components";
+
+import walls from "./game/config/map/mapa_1.json";
 
 const canvas = document.getElementById("game-canvas") as HTMLCanvasElement;
 const ctx = canvas.getContext("2d");
 
+// Create game class that holds everything
 const game = new Game({
   // change this to viewport
   width: 256,
@@ -34,10 +39,12 @@ const game = new Game({
   context: ctx,
 });
 
+// Create Scene where all entities live
 const overworld = new Scene({
   name: "overworld",
 });
 
+// I dont like this order of adding components
 const map = overworld.entityManager.createEntity();
 map
   .addComponent(new PositionComponent({ x: 0, y: 0 }))
@@ -79,6 +86,7 @@ player
   .addComponent(new TagComponent({ tag: "player" }));
 
 // create camera
+// TODO - this has be after creating player otherwise it will be null and error fix that
 const camera = new Camera({
   x: 0,
   y: 0,
@@ -87,18 +95,24 @@ const camera = new Camera({
   context: ctx,
   follow: player,
 });
-
+// add it to the scene
 game.addCamera(camera);
 
+// Add all the systems to the scene
+// all of them will be auto updated in the game loop and run on entities in the scene
+// ORDER IS IMPORTANT!!!!!
 overworld.systemManager.addSystems([
-  new MovementSystem(ctx),
+  new MovementSystem(ctx, camera),
   new WallCollisionSystem(),
   new EnemyCollisionSystem(),
   new PlayerAttackSystem(),
   new ProjectileCollisionSystem(),
+  // Not sure about this? passing ctx and camera to render system?
   new RenderSystem({ ctx, camera, debug: true }),
 ]);
 
+// Add walls to the scene from Tiled exported file
+// TODO move this somewher else
 walls.forEach((wall) => {
   overworld.entityManager
     .createEntity()
@@ -131,8 +145,10 @@ for (let i = 0; i < 20; i++) {
     .addComponent(new TagComponent({ tag: "enemy" }));
 }
 
+// finally add the constructed scene to the game
 game.addScene(overworld);
 
+// create a loop that will run the game
 let lastTime = 0;
 function gameLoop(timestamp: number) {
   const deltaTime = (timestamp - lastTime) / 1000;
