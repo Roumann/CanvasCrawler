@@ -1,19 +1,15 @@
 import { ColliderComponent } from "../../components/physics/Collider";
 import { HealthComponent } from "../../components/gameplay/Health";
-
 import { PositionComponent } from "../../components/base/Position";
 import { SpriteComponent } from "../../components/rendering/Sprite";
 import { TagComponent } from "../../components/systems/Tag";
-
-import { Entity } from "../../core/Entity";
 import { System } from "../../core/System";
-import { EntityManager } from "../../managers/EntityManager";
 import { InventoryComponent } from "../../components";
 import { WeaponComponent } from "../../components/base/Weapon";
 
 export class PlayerAttackSystem extends System {
   attackTimer: number = 0;
-  attackDelay: number = 1000; // 1 second delay between attacks
+  attackDelay: number = 100; // 1 second delay between attacks
 
   constructor() {
     super();
@@ -26,18 +22,20 @@ export class PlayerAttackSystem extends System {
     const inventory = player.getComponent(
       "InventoryComponent"
     ) as InventoryComponent;
-    const position = player.getComponent(
-      "PositionComponent"
-    ) as PositionComponent;
 
     if (inventory && inventory.weapons.length > 0) {
-      this.attackTimer += deltaTime;
+      this.attackTimer += deltaTime * 1000;
 
       inventory.weapons.forEach((weapon) => {
         // Render and handle the attack animation without recreating the weapon
+        console.log(this.attackTimer);
 
+        if (this.attackTimer < this.attackDelay) return;
+
+        weapon.attack(this.entityManager, player);
+        this.attackTimer = 0;
         // Deal damage to enemies in range
-        this.dealDamageInRange(position, weapon);
+        // this.dealDamageInRange(position, weapon);
 
         // Clear the attack animation
       });

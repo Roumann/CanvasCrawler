@@ -1,3 +1,4 @@
+import { Scene } from "../core";
 import { System } from "../core/System";
 import { EntityManager } from "./EntityManager";
 

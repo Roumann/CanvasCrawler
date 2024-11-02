@@ -3,19 +3,23 @@ import { SystemManager } from "../managers/SystemManager";
 
 export type TScene = {
   name: string;
+  context: CanvasRenderingContext2D | null;
 };
 
 export class Scene {
+  context: CanvasRenderingContext2D | null;
   entityManager: EntityManager;
   systemManager: SystemManager;
-
   name: string;
 
-  constructor({ name }: TScene) {
+  // TODO Add more information about the scene/game like mouse position, etc
+
+  constructor({ name, context }: TScene) {
     this.name = name;
+    this.context = context ?? null;
+
     this.entityManager = new EntityManager();
     this.systemManager = new SystemManager(this.entityManager);
-    // maybe create render manager separetly?
   }
 
   update(deltaTime: number) {
@@ -26,7 +30,7 @@ export class Scene {
 /*
 Scene
 
-World can hold multiple scenes for exmaple: 
+World can hold multiple scenes for example: 
  - Menu
  - Settings
  - Overworld

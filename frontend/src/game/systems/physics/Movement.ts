@@ -5,6 +5,9 @@ import {
   TagComponent,
   VelocityComponent,
 } from "../../components";
+import { DamageComponent } from "../../components/gameplay/DamageComponent";
+import { LifeTimeComponent } from "../../components/gameplay/LifeTimeComponent";
+import { DirectionComponent } from "../../components/physics/DirectionComponent";
 import { Camera, System } from "../../core";
 import { clamp } from "../../utils/clamp";
 import { Rect } from "../../utils/Rect";
@@ -71,7 +74,10 @@ export class MovementSystem extends System {
             )
             .addComponent(new ColliderComponent({ w: 32, h: 32 }))
             .addComponent(new SpriteComponent({ src: "/items/gem.png" }))
-            .addComponent(new VelocityComponent({ vx: 120, vy: 120 }))
+            .addComponent(new VelocityComponent({ vx: 60, vy: 60 }))
+            .addComponent(new LifeTimeComponent({ time: 2 }))
+            .addComponent(new DamageComponent({ value: 10 }))
+            .addComponent(new DirectionComponent({}))
             .addComponent(new TagComponent({ tag: "projectile" }));
 
           break;

@@ -66,7 +66,6 @@ export class EnemyCollisionSystem extends System {
     // ADD ISALIVE TAG TO ENTITY AFTER RENDER IF FLAG FALSE = DELETE IT
     if (!this.entityManager) return;
 
-    console.log(health.health);
     if (health.health === -500) {
       this.entityManager
         .createEntity()

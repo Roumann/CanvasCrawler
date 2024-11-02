@@ -4,7 +4,7 @@ import {
   EnemyCollisionSystem,
   MovementSystem,
   PlayerAttackSystem,
-  ProjectileCollisionSystem,
+  ProjectileSystem,
   RenderSystem,
   WallCollisionSystem,
 } from "./game/systems";
@@ -25,6 +25,7 @@ import {
 } from "./game/components";
 
 import walls from "./game/config/map/mapa_1.json";
+import { DirectionComponent } from "./game/components/physics/DirectionComponent";
 
 const canvas = document.getElementById("game-canvas") as HTMLCanvasElement;
 const ctx = canvas.getContext("2d");
@@ -36,12 +37,12 @@ const game = new Game({
   height: 256,
   // Add map bounds - 3200x3200px
   isPaused: false,
-  context: ctx,
 });
 
 // Create Scene where all entities live
 const overworld = new Scene({
   name: "overworld",
+  context: ctx,
 });
 
 // I dont like this order of adding components
@@ -83,6 +84,7 @@ player
       ],
     })
   )
+  .addComponent(new DirectionComponent({ direction: "right" }))
   .addComponent(new TagComponent({ tag: "player" }));
 
 // create camera
@@ -106,13 +108,13 @@ overworld.systemManager.addSystems([
   new WallCollisionSystem(),
   new EnemyCollisionSystem(),
   new PlayerAttackSystem(),
-  new ProjectileCollisionSystem(),
+  new ProjectileSystem(),
   // Not sure about this? passing ctx and camera to render system?
   new RenderSystem({ ctx, camera, debug: true }),
 ]);
 
 // Add walls to the scene from Tiled exported file
-// TODO move this somewher else
+// TODO move this somewhere else
 walls.forEach((wall) => {
   overworld.entityManager
     .createEntity()

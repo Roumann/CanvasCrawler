@@ -4,14 +4,12 @@ import { Scene } from "./Scene";
 export type TWorld = {
   width: number;
   height: number;
-  context: CanvasRenderingContext2D | null;
 
   currentScene?: Scene;
   isPaused?: boolean;
 };
 
 export class Game {
-  context: CanvasRenderingContext2D | null;
   width: number;
   height: number;
 
@@ -22,8 +20,7 @@ export class Game {
   isPaused: boolean;
   lastTime: number;
 
-  constructor({ currentScene, width, height, isPaused, context }: TWorld) {
-    this.context = context ?? null;
+  constructor({ currentScene, width, height, isPaused }: TWorld) {
     this.width = width;
     this.height = height;
 
@@ -38,7 +35,7 @@ export class Game {
   }
 
   start(deltaTime: number) {
-    if (this.isPaused || !this.context) return;
+    if (this.isPaused) return;
 
     this.currentScene?.update(deltaTime);
 

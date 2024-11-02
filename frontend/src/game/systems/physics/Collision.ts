@@ -93,11 +93,17 @@ export class CollisionSystem extends System {
     // Logic to prevent enemy from moving through the wall
   }
 
-  checkCollision(
-    colliderA: ColliderComponent,
-    colliderB: ColliderComponent
-  ): boolean {
-    // Generalized collision detection logic
-    return true /* collision check result */;
+  checkCollision(entity1: Entity, entity2: Entity): boolean {
+    const pos1 = entity1.getComponent("PositionComponent");
+    const pos2 = entity2.getComponent("PositionComponent");
+    const col1 = entity1.getComponent("ColliderComponent");
+    const col2 = entity2.getComponent("ColliderComponent");
+
+    return (
+      pos1.x < pos2.x + col2.width &&
+      pos1.x + col1.width > pos2.x &&
+      pos1.y < pos2.y + col2.height &&
+      pos1.y + col1.height > pos2.y
+    );
   }
 }
