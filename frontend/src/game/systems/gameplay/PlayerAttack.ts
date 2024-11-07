@@ -9,7 +9,7 @@ import { WeaponComponent } from "../../components/base/Weapon";
 
 export class PlayerAttackSystem extends System {
   attackTimer: number = 0;
-  attackDelay: number = 100; // 1 second delay between attacks
+  attackDelay: number = 600; // 1 second delay between attacks
 
   constructor() {
     super();
@@ -17,29 +17,40 @@ export class PlayerAttackSystem extends System {
 
   update(deltaTime: number) {
     if (!this.entityManager) return;
+    this.attackTimer += deltaTime * 1000;
 
     const player = this.entityManager.getEntitiesByTag("player")[0];
     const inventory = player.getComponent(
       "InventoryComponent"
     ) as InventoryComponent;
 
+    // TODO rework weapon delay instead of centralized timer, have each weapon have its own timer
     if (inventory && inventory.weapons.length > 0) {
-      this.attackTimer += deltaTime * 1000;
+      if (this.attackTimer < this.attackDelay) return;
+      this.attackTimer = 0;
 
-      inventory.weapons.forEach((weapon) => {
-        // Render and handle the attack animation without recreating the weapon
-        console.log(this.attackTimer);
-
-        if (this.attackTimer < this.attackDelay) return;
-
+      for (const weapon of inventory.weapons) {
         weapon.attack(this.entityManager, player);
-        this.attackTimer = 0;
-        // Deal damage to enemies in range
-        // this.dealDamageInRange(position, weapon);
-
-        // Clear the attack animation
-      });
+      }
     }
+
+    // if (inventory && inventory.weapons.length > 0) {
+    //   this.attackTimer += deltaTime * 1000;
+
+    //   inventory.weapons.forEach((weapon) => {
+    //     // Render and handle the attack animation without recreating the weapon
+    //     if (this.attackTimer < this.attackDelay) return;
+    //     this.attackTimer = 0;
+
+    //     console.log(weapon.damage);
+    //     weapon.attack(this.entityManager, player);
+
+    //     // Deal damage to enemies in range
+    //     // this.dealDamageInRange(position, weapon);
+
+    //     // Clear the attack animation
+    //   });
+    // }
   }
 
   dealDamageInRange(position: PositionComponent, weapon: WeaponComponent) {

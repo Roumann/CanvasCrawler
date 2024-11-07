@@ -26,6 +26,8 @@ import {
 
 import walls from "./game/config/map/mapa_1.json";
 import { DirectionComponent } from "./game/components/physics/DirectionComponent";
+import { AnimationComponent } from "./game/components/rendering/Animation";
+import { playerAnimations } from "./game/animations/player";
 
 const canvas = document.getElementById("game-canvas") as HTMLCanvasElement;
 const ctx = canvas.getContext("2d");
@@ -63,17 +65,42 @@ player
   .addComponent(
     new SpriteComponent({
       src: "/characters/char_4.png",
-      size: { w: 16, h: 22 },
+      size: { w: 15, h: 21 },
     })
   )
+  .addComponent(
+    new AnimationComponent({
+      animations: playerAnimations,
+      currentAnimation: "idle-right",
+      spriteGridSize: { w: 32, h: 32 },
+      frameRate: 16,
+    })
+  )
+  .addComponent(new DirectionComponent({ direction: "right" }))
   .addComponent(new SpriteOffsetComponent({ x: 8, y: 8 }))
   .addComponent(
     new InventoryComponent({
       weapons: [
         new WeaponComponent({
           damage: 10,
-          range: 64,
+          range: 10,
+          size: { w: 32, h: 32 },
+          collider: { w: 32, h: 32 },
+          velocity: { vx: 60, vy: 60 },
+          lifeTime: 2,
+          tag: "projectile",
           src: "/items/sword.png",
+        }),
+        new WeaponComponent({
+          damage: 5,
+          range: 10,
+          size: { w: 8, h: 8 },
+          collider: { w: 8, h: 8 },
+          velocity: { vx: 220, vy: 220 },
+          lifeTime: 2,
+          tag: "projectile",
+          src: "/items/gem.png",
+          direction: "right",
         }),
       ],
       passiveItems: [
@@ -107,8 +134,8 @@ overworld.systemManager.addSystems([
   new MovementSystem(ctx, camera),
   new WallCollisionSystem(),
   new EnemyCollisionSystem(),
-  new PlayerAttackSystem(),
-  new ProjectileSystem(),
+  // new PlayerAttackSystem(),
+  // new ProjectileSystem(),
   // Not sure about this? passing ctx and camera to render system?
   new RenderSystem({ ctx, camera, debug: true }),
 ]);
@@ -138,6 +165,7 @@ for (let i = 0; i < 20; i++) {
     .addComponent(new VelocityComponent({ vx: 120, vy: 120 }))
     .addComponent(new HealthComponent({ health: 100, maxHealth: 100 }))
     .addComponent(new CollisionDamageComponent({ damage: 10 }))
+
     .addComponent(
       new SpriteComponent({
         src: "/characters/enemy1.png",

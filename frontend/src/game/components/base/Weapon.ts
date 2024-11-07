@@ -12,25 +12,50 @@ import { PositionComponent } from "./Position";
 export type TWeaponComponent = {
   damage: number;
   range: number;
+  size: { w: number; h: number };
+  collider: { w: number; h: number };
+  velocity: { vx: number; vy: number };
+  lifeTime: number;
+  tag: string;
+  direction?: "up" | "down" | "left" | "right";
   src: string;
 };
 
 export class WeaponComponent {
   damage: number;
   range: number;
-  sprite: SpriteComponent;
-  position: PositionComponent;
-  collider: ColliderComponent;
+  sprite: {
+    src: string;
+    size: { w: number; h: number };
+  };
+  collider: { w: number; h: number };
+  velocity: { vx: number; vy: number };
+  lifeTime: number;
+  direction?: "up" | "down" | "left" | "right" | null;
+  tag: string;
 
-  constructor({ damage, range, src }: TWeaponComponent) {
+  constructor({
+    damage,
+    range,
+    size,
+    collider,
+    velocity,
+    lifeTime,
+    tag,
+    direction,
+    src,
+  }: TWeaponComponent) {
     this.damage = damage;
-    this.range = range;
-    this.sprite = new SpriteComponent({
+    this.range = range; // TODO implement range
+    this.sprite = {
       src: src ?? "/items/sword.png",
-      size: { w: 64, h: 64 },
-    });
-    this.position = new PositionComponent({ x: 0, y: 0 });
-    this.collider = new ColliderComponent({ w: 64, h: 64 });
+      size: size ?? { w: 32, h: 32 },
+    };
+    this.collider = collider ?? { w: 32, h: 32 };
+    this.velocity = velocity ?? { vx: 60, vy: 60 };
+    this.lifeTime = lifeTime ?? 2;
+    this.direction = direction ?? null;
+    this.tag = tag ?? "projectile";
   }
 
   attack(entityManager: EntityManager | null, player: Entity) {
@@ -43,14 +68,12 @@ export class WeaponComponent {
     entityManager
       .createEntity()
       .addComponent(new PositionComponent({ x: playerPos.x, y: playerPos.y }))
-      .addComponent(new ColliderComponent({ w: 8, h: 8 }))
-      .addComponent(
-        new SpriteComponent({ src: "/items/gem.png", size: { w: 8, h: 8 } })
-      )
-      .addComponent(new VelocityComponent({ vx: 60, vy: 60 }))
-      .addComponent(new LifeTimeComponent({ time: 2 }))
-      .addComponent(new DamageComponent({ value: 10 }))
-      .addComponent(new DirectionComponent({}))
-      .addComponent(new TagComponent({ tag: "projectile" }));
+      .addComponent(new ColliderComponent(this.collider))
+      .addComponent(new SpriteComponent(this.sprite))
+      .addComponent(new VelocityComponent(this.velocity))
+      .addComponent(new LifeTimeComponent({ time: this.lifeTime }))
+      .addComponent(new DamageComponent({ value: this.damage }))
+      .addComponent(new DirectionComponent({ direction: this.direction }))
+      .addComponent(new TagComponent({ tag: this.tag }));
   }
 }

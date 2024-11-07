@@ -4,6 +4,7 @@ import {
   SpriteComponent,
   SpriteOffsetComponent,
 } from "../../components";
+import { AnimationComponent } from "../../components/rendering/Animation";
 import { Camera, System } from "../../core";
 
 type TRenderSystem = {
@@ -63,6 +64,18 @@ export class RenderSystem extends System {
         }
 
         if (sprite && sprite.isLoaded && this.ctx) {
+          const animation = entity.getComponent(
+            "AnimationComponent"
+          ) as AnimationComponent;
+
+          let [frameX, frameY] = [0, 0];
+          let spriteGridSize = { w: 0, h: 0 };
+
+          if (animation) {
+            [frameX, frameY] = animation.frame;
+            spriteGridSize = animation.spriteGridSize;
+          }
+
           if (this.debug) {
             this.ctx.strokeRect(cameraX, cameraY, sprite.size.w, sprite.size.h);
           }
@@ -70,8 +83,8 @@ export class RenderSystem extends System {
           this.ctx.imageSmoothingEnabled = false;
           this.ctx.drawImage(
             sprite.image,
-            0 + offset.x, // Animation frame selection goes here
-            0 + offset.y,
+            frameX * spriteGridSize.w + offset.x, // Animation frame selection goes here
+            frameY * spriteGridSize.h + offset.y,
             sprite.size.w,
             sprite.size.h,
             cameraX,
@@ -79,6 +92,10 @@ export class RenderSystem extends System {
             sprite.size.w,
             sprite.size.h
           );
+
+          if (animation) {
+            animation.animate();
+          }
         }
         // If no sprite, render a basic rectangle (e.g., for walls)
         else {

@@ -112,7 +112,9 @@ export type PlayerAnimations =
   | "idle-left"
   | "walk-right"
   | "walk-left"
-  | "walk-up"
-  | "walk-down"
+  | "walk-up-r"
+  | "walk-up-l"
+  | "walk-down-r"
+  | "walk-down-l"
   | "damage"
   | "death";

@@ -1,32 +1,25 @@
-import {
-  ColliderComponent,
-  PositionComponent,
-  SpriteComponent,
-  TagComponent,
-  VelocityComponent,
-} from "../../components";
-import { DamageComponent } from "../../components/gameplay/DamageComponent";
-import { LifeTimeComponent } from "../../components/gameplay/LifeTimeComponent";
 import { DirectionComponent } from "../../components/physics/DirectionComponent";
+import { AnimationComponent } from "../../components/rendering/Animation";
 import { Camera, System } from "../../core";
 import { clamp } from "../../utils/clamp";
 import { Rect } from "../../utils/Rect";
 
 export class MovementSystem extends System {
-  left: boolean;
-  right: boolean;
-  up: boolean;
-  down: boolean;
+  pressedKeys: Set<string>;
+  keyMap: { [key: string]: string };
   bounds: Rect;
   context: CanvasRenderingContext2D | null;
   camera: Camera;
 
   constructor(ctx: CanvasRenderingContext2D | null, camera: Camera) {
     super();
-    this.left = false;
-    this.right = false;
-    this.up = false;
-    this.down = false;
+    this.pressedKeys = new Set();
+    this.keyMap = {
+      ArrowLeft: "left",
+      ArrowRight: "right",
+      ArrowUp: "up",
+      ArrowDown: "down",
+    };
 
     this.context = ctx ?? null;
     this.bounds = new Rect({ x: 0, y: 0, w: 3200, h: 3200 });
@@ -38,71 +31,14 @@ export class MovementSystem extends System {
 
   addEventListeners() {
     window.addEventListener("keydown", (e) => {
-      switch (e.key) {
-        case "ArrowLeft":
-          this.left = true;
-          break;
-        case "ArrowRight":
-          this.right = true;
-          break;
-        case "ArrowUp":
-          this.up = true;
-          break;
-        case "ArrowDown":
-          this.down = true;
-          break;
-      }
-    });
-
-    window.addEventListener("mousedown", (e) => {
-      const rect = this.context?.canvas.getBoundingClientRect();
-      if (!rect) return;
-
-      const mousePosX = e.pageX - rect.left;
-      const mousePosY = e.pageY - rect.top;
-
-      switch (e.button) {
-        case 0:
-          console.log("Add");
-          this.entityManager
-            ?.createEntity()
-            .addComponent(
-              new PositionComponent({
-                x: mousePosX + this.camera.x,
-                y: mousePosY + this.camera.y,
-              })
-            )
-            .addComponent(new ColliderComponent({ w: 32, h: 32 }))
-            .addComponent(new SpriteComponent({ src: "/items/gem.png" }))
-            .addComponent(new VelocityComponent({ vx: 60, vy: 60 }))
-            .addComponent(new LifeTimeComponent({ time: 2 }))
-            .addComponent(new DamageComponent({ value: 10 }))
-            .addComponent(new DirectionComponent({}))
-            .addComponent(new TagComponent({ tag: "projectile" }));
-
-          break;
-        case 1:
-          console.log("Remove");
-          this.entityManager?.removeEntityByTag("projectile");
-
-          break;
+      if (this.keyMap[e.key] && !this.pressedKeys.has(this.keyMap[e.key])) {
+        this.pressedKeys.add(this.keyMap[e.key]);
       }
     });
 
     window.addEventListener("keyup", (e) => {
-      switch (e.key) {
-        case "ArrowLeft":
-          this.left = false;
-          break;
-        case "ArrowRight":
-          this.right = false;
-          break;
-        case "ArrowUp":
-          this.up = false;
-          break;
-        case "ArrowDown":
-          this.down = false;
-          break;
+      if (this.keyMap[e.key]) {
+        this.pressedKeys.delete(this.keyMap[e.key]);
       }
     });
   }
@@ -116,23 +52,66 @@ export class MovementSystem extends System {
     const position = player.getComponent("PositionComponent");
     const velocity = player.getComponent("VelocityComponent");
     const size = player.getComponent("ColliderComponent");
+    const direction = player.getComponent(
+      "DirectionComponent"
+    ) as DirectionComponent;
 
-    if (!position || !velocity || !size || !this.context) return;
+    const animation = player.getComponent("AnimationComponent");
 
-    if (this.left) {
-      position.x -= velocity.vx * deltaTime;
+    if (!position || !velocity || !size || !direction || !this.context) return;
+
+    if (this.pressedKeys.size === 0) {
+      this.setIdleAnimation(direction, animation);
+      return;
     }
-    if (this.right) {
-      position.x += velocity.vx * deltaTime;
-    }
-    if (this.up) {
-      position.y -= velocity.vy * deltaTime;
-    }
-    if (this.down) {
-      position.y += velocity.vy * deltaTime;
-    }
+
+    this.pressedKeys.forEach((keyDirection) => {
+      switch (keyDirection) {
+        case "left":
+          direction.direction = "left";
+
+          if (animation) {
+            animation.currentAnimation = "walk-left";
+          }
+
+          position.x -= velocity.vx * deltaTime;
+          break;
+        case "right":
+          direction.direction = "right";
+          if (animation) {
+            animation.currentAnimation = "walk-right";
+          }
+
+          position.x += velocity.vx * deltaTime;
+          break;
+        case "up":
+          if (animation) {
+            animation.currentAnimation =
+              direction.direction === "left" ? "walk-up-l" : "walk-up-r";
+          }
+
+          position.y -= velocity.vy * deltaTime;
+          break;
+        case "down":
+          if (animation) {
+            animation.currentAnimation =
+              direction.direction === "left" ? "walk-down-l" : "walk-down-r";
+          }
+
+          position.y += velocity.vy * deltaTime;
+          break;
+      }
+    });
 
     position.x = clamp(position.x, 0, this.bounds.w - size.w);
     position.y = clamp(position.y, 0, this.bounds.h - size.h);
+  }
+
+  setIdleAnimation(
+    direction: DirectionComponent,
+    animation: AnimationComponent
+  ) {
+    const idleDir = direction.direction === "left" ? "left" : "right";
+    animation.currentAnimation = `idle-${idleDir}`;
   }
 }

@@ -1,9 +1,9 @@
 export type TDirectionComponent = {
-  direction?: "up" | "down" | "left" | "right";
+  direction?: "up" | "down" | "left" | "right" | null;
 };
 
 export class DirectionComponent {
-  direction: "up" | "down" | "left" | "right";
+  direction: "up" | "down" | "left" | "right" | null;
 
   constructor({ direction }: TDirectionComponent) {
     this.direction = direction ?? this.getRandomDirection();
