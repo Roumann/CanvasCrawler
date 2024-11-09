@@ -1,10 +1,21 @@
-import { EntityManager } from "../managers/EntityManager";
+import { Scene } from "./Scene";
 
+// TODO - refractor this
+// need the scene to be avaible without Null checks everywhere but also not require the user to pass it in every system initialization
 export abstract class System {
-  protected entityManager: EntityManager | null = null;
+  private _scene: Scene | null = null;
 
-  setEntityManager(entityManager: EntityManager) {
-    this.entityManager = entityManager;
+  protected get scene(): Scene {
+    if (!this._scene) {
+      throw new Error(
+        "Scene not set. Make sure to call setScene before using the system."
+      );
+    }
+    return this._scene;
+  }
+
+  setScene(scene: Scene) {
+    this._scene = scene;
   }
 
   abstract update(...args: any[]): void;

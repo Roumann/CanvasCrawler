@@ -1,21 +1,18 @@
-import { Camera } from "./Camera";
 import { Scene } from "./Scene";
 
 export type TWorld = {
   width: number;
   height: number;
-
   currentScene?: Scene;
   isPaused?: boolean;
 };
 
-export class Game {
+export class World {
   width: number;
   height: number;
 
   scenes: Map<string, Scene>;
   currentScene: Scene | null; // Automatically crate base scene if none is passed in
-  camera: Camera | null;
 
   isPaused: boolean;
   lastTime: number;
@@ -24,7 +21,6 @@ export class Game {
     this.width = width;
     this.height = height;
 
-    this.camera = null;
     this.scenes = new Map<string, Scene>();
     this.currentScene = currentScene ?? null;
 
@@ -38,8 +34,6 @@ export class Game {
     if (this.isPaused) return;
 
     this.currentScene?.update(deltaTime);
-
-    this.camera?.update();
   }
 
   addScene(scene: Scene) {
@@ -49,13 +43,11 @@ export class Game {
     this.scenes.set(scene.name, scene);
   }
 
-  addCamera(camera: Camera) {
-    this.camera = camera;
-  }
-
   setScene(scene: string) {
+    // TODO - COMPLETELY CLEAR EVERYTHING FROM THE LAST SCENE
+
     const newScene = this.scenes.get(scene);
-    //maybe throw error if scene doesnt exist
+    //maybe throw error if scene doesn't exist
     if (!newScene) return;
     this.currentScene = newScene;
   }

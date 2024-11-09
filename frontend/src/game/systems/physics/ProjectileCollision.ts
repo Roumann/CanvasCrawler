@@ -6,9 +6,8 @@ export class ProjectileCollisionSystem extends System {
   }
 
   update(deltaTime: number) {
-    if (!this.entityManager) return;
-    const projectiles = this.entityManager.getEntitiesByTag("projectile");
-    const enemies = this.entityManager.getEntitiesByTag("enemy");
+    const projectiles = this.scene.entityManager.getEntitiesByTag("projectile");
+    const enemies = this.scene.entityManager.getEntitiesByTag("enemy");
 
     if (!projectiles.length || !enemies.length) {
       return;

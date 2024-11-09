@@ -1,63 +1,46 @@
-import { Entity } from ".";
+import { EntityManager } from "../managers/EntityManager";
 import { clamp } from "../utils/clamp";
+import { Vector2 } from "../utils/Vector2";
 
 export type TCamera = {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
+  camera: { bounds: { min: number; max: number } };
   context: CanvasRenderingContext2D | null;
-  follow: Entity;
 };
 
 export class Camera {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-
-  worldBounds: any;
+  pos: Vector2;
+  cameraBounds: { min: number; max: number };
   context: CanvasRenderingContext2D | null;
-  followEntity: Entity;
 
-  constructor({ x, y, width, height, context, follow }: TCamera) {
-    this.x = x;
-    this.y = y;
-    this.width = width;
-    this.height = height;
-    this.context = context ?? null;
-    this.worldBounds = {
-      min: 0,
-      max: 3200,
-    };
-    this.followEntity = follow;
+  constructor({ camera, context }: TCamera) {
+    this.pos = new Vector2(0, 0);
+    this.context = context;
+    this.cameraBounds = camera.bounds;
   }
 
-  update() {
-    const position = this.followEntity.getComponent("PositionComponent");
-    if (!position || !this.context) return;
+  update(entityManager: EntityManager) {
+    const follow = entityManager.getEntitiesWithComponents([
+      "CameraFollowComponent",
+    ])[0];
 
-    this.x = clamp(
+    if (!follow || !this.context) return;
+    const position = follow.getComponent("PositionComponent");
+    if (!position) return;
+
+    this.pos.x = clamp(
       position.x - this.context.canvas.width / 2,
-      this.worldBounds.min,
-      this.worldBounds.max - this.context.canvas.width
+      this.cameraBounds.min,
+      this.cameraBounds.max - this.context.canvas.width
     );
 
-    this.y = clamp(
+    this.pos.y = clamp(
       position.y - this.context.canvas.height / 2,
-      this.worldBounds.min,
-      this.worldBounds.max - this.context.canvas.height
+      this.cameraBounds.min,
+      this.cameraBounds.max - this.context.canvas.height
     );
-
-    // this.x = position.x;
-    // this.y = position.y;
   }
 
   get position() {
-    return { x: this.x, y: this.y };
-  }
-
-  setFollow(entity: Entity) {
-    this.followEntity = entity;
+    return { x: this.pos.x, y: this.pos.y };
   }
 }

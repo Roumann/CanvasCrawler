@@ -5,30 +5,28 @@ import {
   SpriteOffsetComponent,
 } from "../../components";
 import { AnimationComponent } from "../../components/rendering/Animation";
-import { Camera, System } from "../../core";
+import { System } from "../../core";
 
 type TRenderSystem = {
   ctx: CanvasRenderingContext2D | null;
-  camera: Camera;
   debug?: boolean;
 };
-
+// TODO - add rendering order system
 export class RenderSystem extends System {
   ctx: CanvasRenderingContext2D | null;
-  camera: Camera;
   debug: boolean;
 
-  constructor({ ctx, camera, debug = false }: TRenderSystem) {
+  constructor({ ctx, debug = false }: TRenderSystem) {
     super();
     this.ctx = ctx;
-    this.camera = camera;
+
     this.debug = debug;
   }
 
   update(deltaTime: number) {
-    if (!this.entityManager || !this.ctx || !this.camera) return;
+    if (!this.ctx) return;
 
-    const entities = this.entityManager.getEntitiesWithComponents([
+    const entities = this.scene.entityManager.getEntitiesWithComponents([
       "PositionComponent",
       "ColliderComponent",
       "SpriteComponent",
@@ -42,8 +40,8 @@ export class RenderSystem extends System {
         "PositionComponent"
       ) as PositionComponent;
 
-      const cameraX = position.x - this.camera.x;
-      const cameraY = position.y - this.camera.y;
+      const cameraX = position.x - this.scene.camera.pos.x;
+      const cameraY = position.y - this.scene.camera.pos.y;
 
       let offset = {
         x: 0,

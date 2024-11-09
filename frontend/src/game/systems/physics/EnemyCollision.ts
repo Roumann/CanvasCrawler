@@ -14,10 +14,8 @@ export class EnemyCollisionSystem extends System {
   }
 
   update(deltaTime: number) {
-    if (!this.entityManager) return;
-
-    const player = this.entityManager.getEntitiesByTag("player")[0];
-    const enemyEntities = this.entityManager.getEntitiesByTag("enemy");
+    const player = this.scene.entityManager.getEntitiesByTag("player")[0];
+    const enemyEntities = this.scene.entityManager.getEntitiesByTag("enemy");
 
     // TODO FIX THIS
     const position = player.getComponent("PositionComponent");
@@ -64,17 +62,16 @@ export class EnemyCollisionSystem extends System {
 
     // SYSTEM DOESNT DELET ENTITIES - ONLY MARKS THEM FOR DELETION
     // ADD ISALIVE TAG TO ENTITY AFTER RENDER IF FLAG FALSE = DELETE IT
-    if (!this.entityManager) return;
 
     if (health.health === -500) {
-      this.entityManager
+      this.scene.entityManager
         .createEntity()
         .addComponent(new PositionComponent({ x: enemyPos.x, y: enemyPos.y }))
         .addComponent(new ColliderComponent({ w: 32, h: 32 }))
         .addComponent(new SpriteComponent({ src: "/items/gem.png" }))
         .addComponent(new TagComponent({ tag: "drop" }));
 
-      this.entityManager.removeEntityById(enemyId);
+      this.scene.entityManager.removeEntityById(enemyId);
       health.health = 100;
     }
   }

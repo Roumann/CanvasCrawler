@@ -7,10 +7,8 @@ export class ProjectileSystem extends System {
   }
 
   update(deltaTime: number) {
-    if (!this.entityManager) return;
-
-    const projectiles = this.entityManager.getEntitiesByTag("projectile");
-    const enemies = this.entityManager.getEntitiesByTag("enemy");
+    const projectiles = this.scene.entityManager.getEntitiesByTag("projectile");
+    const enemies = this.scene.entityManager.getEntitiesByTag("enemy");
 
     projectiles.forEach((projectile) => {
       const position = projectile.getComponent("PositionComponent");
@@ -22,7 +20,6 @@ export class ProjectileSystem extends System {
       if (!position || !velocity || !lifetime || !direction || !collider)
         return;
 
-      // Move projectile
       switch (direction.direction) {
         case "left":
           position.x -= velocity.vx * deltaTime;
@@ -50,7 +47,7 @@ export class ProjectileSystem extends System {
       // Reduce lifetime and check if expired
       lifetime.time -= deltaTime;
       if (lifetime.time <= 0) {
-        this.entityManager?.removeEntityById(projectile.id);
+        this.scene?.entityManager.removeEntityById(projectile.id);
       }
     });
   }
@@ -70,15 +67,13 @@ export class ProjectileSystem extends System {
   }
 
   resolveCollision(projectile: Entity, enemy: Entity) {
-    if (!this.entityManager) return;
-
     const damage = projectile.getComponent("DamageComponent");
     const health = enemy.getComponent("HealthComponent");
 
     health.health -= damage.value;
 
-    if (health.health === -500) {
-      this.entityManager.removeEntityById(enemy.id);
+    if (health.health <= health.maxHealth) {
+      this.scene.entityManager.removeEntityById(enemy.id);
     }
   }
 }

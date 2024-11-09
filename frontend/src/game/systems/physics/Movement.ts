@@ -1,6 +1,6 @@
 import { DirectionComponent } from "../../components/physics/DirectionComponent";
 import { AnimationComponent } from "../../components/rendering/Animation";
-import { Camera, System } from "../../core";
+import { System } from "../../core";
 import { clamp } from "../../utils/clamp";
 import { Rect } from "../../utils/Rect";
 
@@ -9,9 +9,8 @@ export class MovementSystem extends System {
   keyMap: { [key: string]: string };
   bounds: Rect;
   context: CanvasRenderingContext2D | null;
-  camera: Camera;
 
-  constructor(ctx: CanvasRenderingContext2D | null, camera: Camera) {
+  constructor(ctx: CanvasRenderingContext2D | null) {
     super();
     this.pressedKeys = new Set();
     this.keyMap = {
@@ -23,8 +22,6 @@ export class MovementSystem extends System {
 
     this.context = ctx ?? null;
     this.bounds = new Rect({ x: 0, y: 0, w: 3200, h: 3200 });
-
-    this.camera = camera;
 
     this.addEventListeners();
   }
@@ -45,9 +42,7 @@ export class MovementSystem extends System {
 
   // TODO change the velocity instead of position
   update(deltaTime: number) {
-    if (!this.entityManager) return;
-
-    const player = this.entityManager.getEntityByTag("player");
+    const player = this.scene.entityManager.getEntityByTag("player");
 
     const position = player.getComponent("PositionComponent");
     const velocity = player.getComponent("VelocityComponent");

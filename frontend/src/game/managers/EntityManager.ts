@@ -24,14 +24,22 @@ export class EntityManager {
     })[0];
   }
 
-  getEntitiesByTag(tag: string) {
+  getEntitiesByTag(tag: string): Entity[] {
     return this.entities.filter((entity) => {
       const tagComponent = entity.getComponent("TagComponent");
       return tagComponent && tagComponent.tag === tag;
     });
   }
 
-  getEntitiesWithComponents(componentNames: string[]) {
+  getEntityWithComponent(componentNames: string[]): Entity {
+    return this.entities.filter((entity) => {
+      return componentNames.some((componentName) => {
+        return entity.components.has(componentName);
+      });
+    })[0];
+  }
+
+  getEntitiesWithComponents(componentNames: string[]): Entity[] {
     return this.entities.filter((entity) => {
       return componentNames.some((componentName) => {
         return entity.components.has(componentName);
@@ -39,7 +47,10 @@ export class EntityManager {
     });
   }
 
-  getEntitiesWithComponentsExcl(componentNames: string[], exclude: string[]) {
+  getEntitiesWithComponentsExcl(
+    componentNames: string[],
+    exclude: string[]
+  ): Entity[] {
     const allEntities = this.entities.filter((entity) => {
       // Check if the entity has all required components
       return componentNames.every((componentName) => {

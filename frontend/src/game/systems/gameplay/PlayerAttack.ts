@@ -9,17 +9,16 @@ import { WeaponComponent } from "../../components/base/Weapon";
 
 export class PlayerAttackSystem extends System {
   attackTimer: number = 0;
-  attackDelay: number = 600; // 1 second delay between attacks
+  attackDelay: number = 600; // 600 ms delay between attacks
 
   constructor() {
     super();
   }
 
   update(deltaTime: number) {
-    if (!this.entityManager) return;
     this.attackTimer += deltaTime * 1000;
 
-    const player = this.entityManager.getEntitiesByTag("player")[0];
+    const player = this.scene.entityManager.getEntitiesByTag("player")[0];
     const inventory = player.getComponent(
       "InventoryComponent"
     ) as InventoryComponent;
@@ -30,7 +29,7 @@ export class PlayerAttackSystem extends System {
       this.attackTimer = 0;
 
       for (const weapon of inventory.weapons) {
-        weapon.attack(this.entityManager, player);
+        weapon.attack(this.scene.entityManager, player);
       }
     }
 
@@ -54,12 +53,10 @@ export class PlayerAttackSystem extends System {
   }
 
   dealDamageInRange(position: PositionComponent, weapon: WeaponComponent) {
-    if (!this.entityManager) return;
-
     const damage = weapon.damage;
     const attackRange = weapon.range;
 
-    const enemies = this.entityManager.getEntitiesByTag("enemy");
+    const enemies = this.scene.entityManager.getEntitiesByTag("enemy");
 
     enemies.forEach((enemy) => {
       const enemyPos = enemy.getComponent(
@@ -75,8 +72,8 @@ export class PlayerAttackSystem extends System {
 
         if (health.health === -500) {
           // TODO FIX THIS
-          if (!this.entityManager) return;
-          this.entityManager
+
+          this.scene.entityManager
             .createEntity()
             .addComponent(
               new PositionComponent({ x: enemyPos.x, y: enemyPos.y })
@@ -85,7 +82,7 @@ export class PlayerAttackSystem extends System {
             .addComponent(new SpriteComponent({ src: "/items/gem.png" }))
             .addComponent(new TagComponent({ tag: "drop" }));
 
-          this.entityManager.removeEntityById(enemyId);
+          this.scene.entityManager.removeEntityById(enemyId);
           health.health = 100;
         }
       }

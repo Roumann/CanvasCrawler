@@ -3,9 +3,8 @@ import { System } from "../../core";
 
 export class WallCollisionSystem extends System {
   update(deltaTime: number) {
-    if (!this.entityManager) return;
-    const entities = this.entityManager.getEntitiesByTag("player");
-    const wallEntities = this.entityManager.getEntitiesByTag("wall");
+    const entities = this.scene.entityManager.getEntitiesByTag("player");
+    const wallEntities = this.scene.entityManager.getEntitiesByTag("wall");
 
     entities.forEach((entity) => {
       const position = entity.getComponent("PositionComponent");

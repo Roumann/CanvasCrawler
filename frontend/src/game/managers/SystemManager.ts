@@ -6,7 +6,7 @@ export class SystemManager {
   systems: System[];
   nextId: number;
 
-  constructor(private entityManager: EntityManager) {
+  constructor(private scene: Scene) {
     this.systems = [];
     this.nextId = 1;
   }
@@ -18,10 +18,11 @@ export class SystemManager {
   }
 
   addSystem(system: System) {
-    system.setEntityManager(this.entityManager);
+    system.setScene(this.scene);
     this.systems.push(system);
   }
 
+  // TODO do this for all functions in CORE ECS
   /**
    * Adds new system to current scenes system manager.
    *

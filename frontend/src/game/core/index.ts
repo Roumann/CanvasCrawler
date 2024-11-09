@@ -1,4 +1,4 @@
-export * from "./Game";
+export * from "./World";
 export * from "./Scene";
 export * from "./Component";
 export * from "./Entity";

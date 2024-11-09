@@ -1,29 +1,46 @@
 import { EntityManager } from "../managers/EntityManager";
 import { SystemManager } from "../managers/SystemManager";
+import { Camera } from "./Camera";
 
 export type TScene = {
   name: string;
   context: CanvasRenderingContext2D | null;
+  camera: {
+    bounds: { min: number; max: number };
+  };
 };
 
 export class Scene {
+  name: string;
   context: CanvasRenderingContext2D | null;
+  camera: Camera;
+
   entityManager: EntityManager;
   systemManager: SystemManager;
-  name: string;
 
   // TODO Add more information about the scene/game like mouse position, etc
-
-  constructor({ name, context }: TScene) {
+  constructor({ name, context, camera }: TScene) {
     this.name = name;
     this.context = context ?? null;
 
     this.entityManager = new EntityManager();
-    this.systemManager = new SystemManager(this.entityManager);
+    this.systemManager = new SystemManager(this);
+
+    // TODO - add camera to scene
+    this.camera = new Camera({
+      camera,
+      context: context,
+    });
   }
 
   update(deltaTime: number) {
     this.systemManager.update(deltaTime);
+
+    this.camera.update(this.entityManager);
+  }
+
+  addCamera(camera: Camera) {
+    this.camera = camera;
   }
 }
 

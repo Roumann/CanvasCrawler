@@ -35,12 +35,11 @@ export class CollisionSystem extends System {
   }
 
   update() {
-    if (!this.entityManager) return;
-
-    const collidableEntities = this.entityManager.getEntitiesWithComponents([
-      "ColliderComponent",
-      "PositionComponent",
-    ]);
+    const collidableEntities =
+      this.scene.entityManager.getEntitiesWithComponents([
+        "ColliderComponent",
+        "PositionComponent",
+      ]);
 
     // Nested loops to check each pair of collidable entities
     for (let i = 0; i < collidableEntities.length; i++) {
@@ -78,15 +77,13 @@ export class CollisionSystem extends System {
   }
 
   applyProjectileEnemyCollision(projectile: Entity, enemy: Entity) {
-    if (!this.entityManager) return;
     const damage = projectile.getComponent("DamageComponent").value;
     enemy.getComponent("HealthComponent").reduce(damage);
-    this.entityManager.removeEntityById(projectile.id); // Destroy projectile on impact
+    this.scene.entityManager.removeEntityById(projectile.id); // Destroy projectile on impact
   }
 
   applyProjectileWallCollision(projectile: Entity) {
-    if (!this.entityManager) return;
-    this.entityManager.removeEntityById(projectile.id); // Destroy projectile on wall impact
+    this.scene.entityManager.removeEntityById(projectile.id); // Destroy projectile on wall impact
   }
 
   applyEnemyWallCollision(enemy: Entity) {
