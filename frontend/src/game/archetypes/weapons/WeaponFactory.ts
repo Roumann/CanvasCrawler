@@ -19,7 +19,7 @@ class WeaponFactory {
             lifeTime: 0.3,
             cooldown: 1,
             interval: 1,
-            collider: { w: 32, h: 32 },
+            collider: { w: 32, h: 32, layer: ["enemy"] },
             velocity: { vx: 0, vy: 0 },
           },
           sprite: {
@@ -50,7 +50,7 @@ class WeaponFactory {
             lifeTime: 2,
             cooldown: 0.5,
             interval: 0.5,
-            collider: { w: 32, h: 15 },
+            collider: { w: 32, h: 15, layer: ["enemy"] },
             velocity: { vx: 120, vy: 120 },
           },
           sprite: {

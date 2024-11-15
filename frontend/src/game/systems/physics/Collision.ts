@@ -1,106 +1,116 @@
-/**
- * Collision system
- * Handles collisions between collidable entities
- *
- * Merge my current setup to this one system
- *
- * get the player and every entity that has collider component
- * check if the player is colliding with the entity
- *
- * if so, call the onCollision function
- * in the onCollision function determine what type of entity it is
- *
- * if it is an enemy, call the onEnemyCollision function
- * if it is a wall call the onWallCollision function
- *
- *  MAYBE BETTER VERSION
- *
- *  get all the collidable entities
- *  loop through them
- *  check if any of them are colliding
- *  if so, call the onCollision function
- *  onCollision function will push the entities away from each other so they dont overlap
- *  check if entity has knockback component
- *  if so, apply the knockback to the entity it is colliding with (if wall then ignore)
- *
- * Maybe add metadab to collider compoent - knockback, damage, etc
- */
-
-import { ColliderComponent } from "../../components";
-import { Entity, System } from "../../core";
+import {
+  ColliderComponent,
+  PositionComponent,
+  HealthComponent,
+  CollisionDamageComponent,
+  SpriteComponent,
+  TagComponent,
+} from "../../components";
+import { System, Entity } from "../../core";
 
 export class CollisionSystem extends System {
-  constructor() {
-    super();
-  }
-
-  update() {
+  update(deltaTime: number) {
     const collidableEntities =
-      this.scene.entityManager.getEntitiesWithComponents([
-        "ColliderComponent",
-        "PositionComponent",
-      ]);
+      this.scene.entityManager.getEntitiesWithComponentsExcl(
+        ["ColliderComponent", "PositionComponent"],
+        ["MapComponent"]
+      );
 
-    // Nested loops to check each pair of collidable entities
     for (let i = 0; i < collidableEntities.length; i++) {
       for (let j = i + 1; j < collidableEntities.length; j++) {
-        const entityA = collidableEntities[i];
-        const entityB = collidableEntities[j];
+        if (collidableEntities[i] === collidableEntities[j]) continue;
 
-        const colliderA = entityA.getComponent("ColliderComponent");
-        const colliderB = entityB.getComponent("ColliderComponent");
-
-        if (this.checkCollision(colliderA, colliderB)) {
-          this.handleCollision(entityA, entityB);
+        if (this.isColliding(collidableEntities[i], collidableEntities[j])) {
+          this.resolveWallCollision(
+            collidableEntities[i],
+            collidableEntities[j]
+          );
         }
       }
     }
   }
 
-  handleCollision(entityA: Entity, entityB: Entity) {
-    if (
-      entityA.hasComponent("ProjectileComponent") &&
-      entityB.hasComponent("EnemyComponent")
-    ) {
-      this.applyProjectileEnemyCollision(entityA, entityB);
-    } else if (
-      entityA.hasComponent("ProjectileComponent") &&
-      entityB.hasComponent("WallComponent")
-    ) {
-      this.applyProjectileWallCollision(entityA);
-    } else if (
-      entityA.hasComponent("EnemyComponent") &&
-      entityB.hasComponent("WallComponent")
-    ) {
-      this.applyEnemyWallCollision(entityA);
+  isColliding(entity1: Entity, entity2: Entity) {
+    const position1 = entity1.getComponent("PositionComponent");
+    const size1 = entity1.getComponent("ColliderComponent");
+    const position2 = entity2.getComponent("PositionComponent");
+    const size2 = entity2.getComponent("ColliderComponent");
+
+    return (
+      position1.x < position2.x + size2.w &&
+      position1.x + size1.w > position2.x &&
+      position1.y < position2.y + size2.h &&
+      position1.y + size1.h > position2.y
+    );
+  }
+
+  resolveWallCollision(entity1: Entity, entity2: Entity) {
+    const position1 = entity1.getComponent("PositionComponent");
+    const size1 = entity1.getComponent("ColliderComponent");
+    const position2 = entity2.getComponent("PositionComponent");
+    const size2 = entity2.getComponent("ColliderComponent");
+
+    const isFixed1 = entity1.hasComponent("FixedPositionComponent");
+    const isFixed2 = entity2.hasComponent("FixedPositionComponent");
+
+    // Calculate overlap distances
+    const deltaX = position1.x + size1.w / 2 - (position2.x + size2.w / 2);
+    const deltaY = position1.y + size1.h / 2 - (position2.y + size2.h / 2);
+
+    const overlapX = size1.w / 2 + size2.w / 2 - Math.abs(deltaX);
+    const overlapY = size1.h / 2 + size2.h / 2 - Math.abs(deltaY);
+
+    if (overlapX > 0 && overlapY > 0) {
+      // Determine the minimum axis of penetration
+      if (overlapX < overlapY) {
+        // Resolve horizontal collision
+        if (deltaX > 0) {
+          // Entity1 is to the right of Entity2
+          if (!isFixed1) position1.x += overlapX;
+          if (!isFixed2) position2.x -= overlapX;
+        } else {
+          // Entity1 is to the left of Entity2
+          if (!isFixed1) position1.x -= overlapX;
+          if (!isFixed2) position2.x += overlapX;
+        }
+      } else {
+        // Resolve vertical collision
+        if (deltaY > 0) {
+          // Entity1 is below Entity2
+          if (!isFixed1) position1.y += overlapY;
+          if (!isFixed2) position2.y -= overlapY;
+        } else {
+          // Entity1 is above Entity2
+          if (!isFixed1) position1.y -= overlapY;
+          if (!isFixed2) position2.y += overlapY;
+        }
+      }
     }
   }
 
-  applyProjectileEnemyCollision(projectile: Entity, enemy: Entity) {
-    const damage = projectile.getComponent("DamageComponent").value;
-    enemy.getComponent("HealthComponent").reduce(damage);
-    this.scene.entityManager.removeEntityById(projectile.id); // Destroy projectile on impact
-  }
+  resolveEnemyCollision(
+    health: HealthComponent,
+    collDmg: CollisionDamageComponent,
+    enemyPos: PositionComponent,
+    enemyId: number
+  ) {
+    health.health -= collDmg.damage;
 
-  applyProjectileWallCollision(projectile: Entity) {
-    this.scene.entityManager.removeEntityById(projectile.id); // Destroy projectile on wall impact
-  }
+    if (health.health <= 0) {
+      this.scene.entityManager
+        .createEntity()
+        .addComponent(new PositionComponent({ x: enemyPos.x, y: enemyPos.y }))
+        .addComponent(
+          new ColliderComponent({
+            w: 32,
+            h: 32,
+          })
+        )
+        .addComponent(new SpriteComponent({ src: "/items/gem.png" }))
+        .addComponent(new TagComponent({ tag: "drop" }));
 
-  applyEnemyWallCollision(enemy: Entity) {
-    // Logic to prevent enemy from moving through the wall
-  }
-
-  checkCollision(entity1: Entity, entity2: Entity): boolean {
-    const pos1 = entity1.getComponent("PositionComponent");
-    const pos2 = entity2.getComponent("PositionComponent");
-    const col1 = entity1.getComponent("ColliderComponent");
-    const col2 = entity2.getComponent("ColliderComponent");
-
-    return (
-      pos1.x < pos2.x + col2.width &&
-      pos1.x + col1.width > pos2.x &&
-      pos1.y < pos2.y + col2.height &&
-      pos1.y + col1.height > pos2.y
-    );
+      this.scene.entityManager.removeEntityById(enemyId);
+      health.health = 100;
+    }
   }
 }

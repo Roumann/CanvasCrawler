@@ -10,3 +10,8 @@ export * from "./systems/Tag";
 export * from "./systems/Tile";
 export * from "./physics/Velocity";
 export * from "./base/Weapon";
+export * from "./physics/DirectionComponent";
+export * from "./rendering/Animation";
+export * from "./gameplay/SceneBackground";
+export * from "./rendering/CameraFollow";
+export * from "./physics/FixedPosition";

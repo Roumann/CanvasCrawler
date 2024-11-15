@@ -96,7 +96,6 @@ export class MovementSystem extends System {
           }
 
           position.y += velocity.vy * deltaTime;
-
           break;
       }
     });

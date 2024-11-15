@@ -32,6 +32,26 @@ export class RenderSystem extends System {
 
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
+    const sceneBackground = this.scene.background;
+    if (sceneBackground) {
+      const position = sceneBackground.position;
+
+      const cameraX = position.x - this.scene.camera.pos.x;
+      const cameraY = position.y - this.scene.camera.pos.y;
+
+      ctx.drawImage(
+        sceneBackground.background.image,
+        0,
+        0,
+        sceneBackground.background.size.w,
+        sceneBackground.background.size.h,
+        cameraX,
+        cameraY,
+        sceneBackground.background.size.w,
+        sceneBackground.background.size.h
+      );
+    }
+
     entities.forEach((entity) => {
       const position = entity.getComponent(
         "PositionComponent"

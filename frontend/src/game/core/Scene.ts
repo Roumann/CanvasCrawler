@@ -1,3 +1,10 @@
+import {
+  ColliderComponent,
+  FixedPositionComponent,
+  PositionComponent,
+  TileComponent,
+} from "../components";
+import { SceneBackground } from "../components/gameplay/SceneBackground";
 import { EntityManager } from "../managers/EntityManager";
 import { SystemManager } from "../managers/SystemManager";
 import { Camera } from "./Camera";
@@ -8,28 +15,33 @@ export type TScene = {
   camera: {
     bounds: { min: number; max: number };
   };
+  background?: {
+    src: string;
+    size: { w: number; h: number };
+  };
+  walls?: any;
 };
 
 export class Scene {
   name: string;
   context: CanvasRenderingContext2D | null;
   camera: Camera;
-
+  background?: SceneBackground | null;
+  walls?: any | null;
   entityManager: EntityManager;
   systemManager: SystemManager;
 
-  // TODO Add more information about the scene/game like mouse position, etc
-  constructor({ name, context, camera }: TScene) {
+  constructor({ name, context, camera, background, walls }: TScene) {
     this.name = name;
     this.context = context ?? null;
-
     this.entityManager = new EntityManager();
     this.systemManager = new SystemManager(this);
-
     this.camera = new Camera({
       camera,
       context: context,
     });
+    this.background = background ? new SceneBackground({ background }) : null;
+    this.walls = walls ? this.createWalls(walls) : null;
   }
 
   update(deltaTime: number) {
@@ -41,6 +53,22 @@ export class Scene {
 
   addCamera(camera: Camera) {
     this.camera = camera;
+  }
+
+  createWalls(walls: any) {
+    walls.forEach((wall: any) => {
+      this.entityManager
+        .createEntity()
+        .addComponent(new PositionComponent({ x: wall.x, y: wall.y }))
+        .addComponent(
+          new ColliderComponent({
+            w: wall.width,
+            h: wall.height,
+          })
+        )
+        .addComponent(new FixedPositionComponent())
+        .addComponent(new TileComponent({ type: "wall" }));
+    });
   }
 }
 

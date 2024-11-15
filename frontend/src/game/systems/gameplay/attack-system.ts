@@ -109,7 +109,7 @@ export class PlayerAttackSystem extends System {
     if (!position || !direction) return;
 
     const offsetY = 8;
-    const offsetX = direction.direction === "left" ? 0 : 8;
+    const offsetX = direction.direction === "left" ? -32 : 16;
 
     this.scene.entityManager
       .createEntity()

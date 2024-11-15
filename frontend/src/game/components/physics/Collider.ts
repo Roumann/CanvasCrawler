@@ -1,3 +1,10 @@
+export type layerColliders =
+  | "player"
+  | "wall"
+  | "projectile"
+  | "enemy"
+  | "pickup";
+
 export type TColliderComponent = {
   w: number;
   h: number;

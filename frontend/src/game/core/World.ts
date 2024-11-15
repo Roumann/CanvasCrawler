@@ -1,26 +1,17 @@
 import { Scene } from "./Scene";
 
 export type TWorld = {
-  width: number;
-  height: number;
   currentScene?: Scene;
   isPaused?: boolean;
 };
 
 export class World {
-  width: number;
-  height: number;
-
   scenes: Map<string, Scene>;
   currentScene: Scene | null; // Automatically crate base scene if none is passed in
-
   isPaused: boolean;
   lastTime: number;
 
-  constructor({ currentScene, width, height, isPaused }: TWorld) {
-    this.width = width;
-    this.height = height;
-
+  constructor({ currentScene, isPaused }: TWorld) {
     this.scenes = new Map<string, Scene>();
     this.currentScene = currentScene ?? null;
 

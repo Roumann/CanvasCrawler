@@ -1,27 +1,27 @@
 import { ColliderComponent, PositionComponent } from "../../components";
-import { System } from "../../core";
+import { Entity, System } from "../../core";
 
 export class WallCollisionSystem extends System {
   update(deltaTime: number) {
-    const entities = this.scene.entityManager.getEntitiesByTag("player");
-    const wallEntities = this.scene.entityManager.getEntitiesByTag("wall");
+    const player = this.scene.entityManager.getEntityByTag("player");
+    const wallEntities = this.scene.entityManager.getEntitiesWithComponents([
+      "TileComponent",
+    ]);
 
-    entities.forEach((entity) => {
-      const position = entity.getComponent("PositionComponent");
-      const size = entity.getComponent("ColliderComponent");
+    const position = player.getComponent("PositionComponent");
+    const size = player.getComponent("ColliderComponent");
 
-      if (!position || !size) return;
+    if (!position || !size) return;
 
-      wallEntities.forEach((wallEntity) => {
-        const wallSize = wallEntity.getComponent("ColliderComponent");
-        const wallPosition = wallEntity.getComponent("PositionComponent");
+    wallEntities.forEach((wallEntity) => {
+      const wallSize = wallEntity.getComponent("ColliderComponent");
+      const wallPosition = wallEntity.getComponent("PositionComponent");
 
-        if (!wallSize || !wallPosition) return;
+      if (!wallSize || !wallPosition) return;
 
-        if (this.isColliding(position, size, wallSize, wallPosition)) {
-          this.resolveCollision(position, size, wallSize, wallPosition);
-        }
-      });
+      if (this.isColliding(position, size, wallSize, wallPosition)) {
+        this.resolveWallCollision(player, wallEntity);
+      }
     });
   }
 
@@ -39,36 +39,46 @@ export class WallCollisionSystem extends System {
     );
   }
 
-  resolveCollision(
-    position: PositionComponent,
-    size: ColliderComponent,
-    wallSize: ColliderComponent,
-    wallPosition: PositionComponent
-  ) {
-    //Calculate the overlap from center of the object to the center of the wall
-    const overlapX =
-      position.x + size.w / 2 - (wallPosition.x + wallSize.w / 2);
-    const overlapY =
-      position.y + size.h / 2 - (wallPosition.y + wallSize.h / 2);
+  resolveWallCollision(entity1: Entity, entity2: Entity) {
+    const position1 = entity1.getComponent("PositionComponent");
+    const size1 = entity1.getComponent("ColliderComponent");
+    const position2 = entity2.getComponent("PositionComponent");
+    const size2 = entity2.getComponent("ColliderComponent");
 
-    // Resolve the collision based on the movement direction
-    if (Math.abs(overlapX) > Math.abs(overlapY)) {
-      // Horizontal collision
-      if (overlapX > 0) {
-        // Player is to the right of the wall
-        position.x = wallPosition.x + wallSize.w; // Move player to the right of the wall
+    const isFixed1 = entity1.hasComponent("FixedPositionComponent");
+    const isFixed2 = entity2.hasComponent("FixedPositionComponent");
+
+    // Calculate overlap distances
+    const deltaX = position1.x + size1.w / 2 - (position2.x + size2.w / 2);
+    const deltaY = position1.y + size1.h / 2 - (position2.y + size2.h / 2);
+
+    const overlapX = size1.w / 2 + size2.w / 2 - Math.abs(deltaX);
+    const overlapY = size1.h / 2 + size2.h / 2 - Math.abs(deltaY);
+
+    if (overlapX > 0 && overlapY > 0) {
+      // Determine the minimum axis of penetration
+      if (overlapX < overlapY) {
+        // Resolve horizontal collision
+        if (deltaX > 0) {
+          // Entity1 is to the right of Entity2
+          if (!isFixed1) position1.x += overlapX;
+          if (!isFixed2) position2.x -= overlapX;
+        } else {
+          // Entity1 is to the left of Entity2
+          if (!isFixed1) position1.x -= overlapX;
+          if (!isFixed2) position2.x += overlapX;
+        }
       } else {
-        // Player is to the left of the wall
-        position.x = wallPosition.x - size.w; // Move player to the left of the wall
-      }
-    } else {
-      // Vertical collision
-      if (overlapY > 0) {
-        // Player is below the wall
-        position.y = wallPosition.y + wallSize.h; // Move player below the wall
-      } else {
-        // Player is above the wall
-        position.y = wallPosition.y - size.h; // Move player above the wall
+        // Resolve vertical collision
+        if (deltaY > 0) {
+          // Entity1 is below Entity2
+          if (!isFixed1) position1.y += overlapY;
+          if (!isFixed2) position2.y -= overlapY;
+        } else {
+          // Entity1 is above Entity2
+          if (!isFixed1) position1.y -= overlapY;
+          if (!isFixed2) position2.y += overlapY;
+        }
       }
     }
   }

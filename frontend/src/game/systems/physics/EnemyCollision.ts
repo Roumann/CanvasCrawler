@@ -6,7 +6,7 @@ import {
   SpriteComponent,
   TagComponent,
 } from "../../components";
-import { Entity, System } from "../../core";
+import { System } from "../../core";
 
 export class EnemyCollisionSystem extends System {
   constructor() {
@@ -14,12 +14,13 @@ export class EnemyCollisionSystem extends System {
   }
 
   update(deltaTime: number) {
-    const player = this.scene.entityManager.getEntitiesByTag("player")[0];
+    const player = this.scene.entityManager.getEntityByTag("player");
     const enemyEntities = this.scene.entityManager.getEntitiesByTag("enemy");
 
     // TODO FIX THIS
     const position = player.getComponent("PositionComponent");
     const size = player.getComponent("ColliderComponent");
+
     const health = player.getComponent("HealthComponent");
 
     if (!position || !size || !health) return;

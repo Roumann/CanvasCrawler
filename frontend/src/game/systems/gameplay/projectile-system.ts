@@ -1,4 +1,8 @@
-import { ColliderComponent, PositionComponent } from "../../components";
+import {
+  ColliderComponent,
+  PositionComponent,
+  WeaponComponent,
+} from "../../components";
 import { AnimationComponent } from "../../components/rendering/Animation";
 import { Entity, System } from "../../core";
 
@@ -8,6 +12,8 @@ export class ProjectileSystem extends System {
   }
 
   // THIS SYSTEM SHOULD TAKE PROJECTILES SPAWNED BY ATTACK SYSTEM AND MOVE THEM, CHECK THEIR LIFETIME, CHECK IF THEY COLLIDE
+  // I SHOULD HAVE SOMEWHERE HERE A SWITCH STATEMENT THAT DETERMINES WHAT TYPE OF PROJECTILE IT IS
+  // DOES IT BOUNCE? DOES IT PASS THROUGH? DOES IT DISAPPEAR?
 
   update(deltaTime: number) {
     const projectiles = this.scene.entityManager.getEntitiesWithComponents([
@@ -22,6 +28,9 @@ export class ProjectileSystem extends System {
       const velocity = projectile.getComponent("VelocityComponent");
       const lifetime = projectile.getComponent("LifeTimeComponent");
       const direction = projectile.getComponent("DirectionComponent");
+      const type = projectile.getComponent(
+        "WeaponComponent"
+      ) as WeaponComponent;
 
       if (!position || !velocity || !lifetime || !direction || !collider)
         return;
