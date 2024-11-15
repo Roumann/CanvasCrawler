@@ -92,6 +92,7 @@ export class PlayerAttackSystem extends System {
           animations: weapon.sprite.animation.animations,
           frameRate: weapon.sprite.animation.frameRate,
           currentAnimation: weapon.sprite.animation.currAnimation,
+          animationType: weapon.sprite.animation.animationType,
         })
       );
     }

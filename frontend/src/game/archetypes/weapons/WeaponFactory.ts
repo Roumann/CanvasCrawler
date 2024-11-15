@@ -3,6 +3,7 @@ import { SpriteComponent, WeaponComponent } from "../../components";
 
 type WeaponType = "sword" | "fireball";
 
+// TODO COMPLETELY REWORK HOW I INITIALIZE THIS
 class WeaponFactory {
   createWeapon(type: WeaponType) {
     switch (type) {
@@ -19,7 +20,7 @@ class WeaponFactory {
             lifeTime: 0.3,
             cooldown: 1,
             interval: 1,
-            collider: { w: 32, h: 32, layer: ["enemy"] },
+            collider: { w: 32, h: 32 },
             velocity: { vx: 0, vy: 0 },
           },
           sprite: {
@@ -32,7 +33,8 @@ class WeaponFactory {
               animations: swordAnimation,
               currAnimation: "slash",
               spriteGridSize: { w: 32, h: 32 },
-              frameRate: 24,
+              frameRate: 8,
+              animationType: "once",
             },
           },
         });
@@ -50,7 +52,7 @@ class WeaponFactory {
             lifeTime: 2,
             cooldown: 0.5,
             interval: 0.5,
-            collider: { w: 32, h: 15, layer: ["enemy"] },
+            collider: { w: 32, h: 15 },
             velocity: { vx: 120, vy: 120 },
           },
           sprite: {

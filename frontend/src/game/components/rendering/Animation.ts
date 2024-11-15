@@ -44,10 +44,10 @@ export class AnimationComponent {
   }
 
   get frame() {
+    console.log(this.isCompleted);
     if (this.isCompleted) return [0, 0];
 
     const frame = this.animations.get(this.currentAnimation);
-
     if (frame === undefined) {
       return [0, 0];
     }

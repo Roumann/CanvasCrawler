@@ -28,11 +28,18 @@ export class ProjectileSystem extends System {
       const velocity = projectile.getComponent("VelocityComponent");
       const lifetime = projectile.getComponent("LifeTimeComponent");
       const direction = projectile.getComponent("DirectionComponent");
-      const type = projectile.getComponent(
-        "WeaponComponent"
-      ) as WeaponComponent;
+      const animation = projectile.getComponent(
+        "AnimationComponent"
+      ) as AnimationComponent;
 
-      if (!position || !velocity || !lifetime || !direction || !collider)
+      if (
+        !position ||
+        !velocity ||
+        !lifetime ||
+        !direction ||
+        !collider ||
+        !animation
+      )
         return;
 
       switch (direction.direction) {
@@ -62,7 +69,9 @@ export class ProjectileSystem extends System {
       // Reduce lifetime and check if expired
       lifetime.time -= deltaTime;
       if (lifetime.time <= 0) {
-        this.scene?.entityManager.removeEntityById(projectile.id);
+        if (animation.isCompleted) {
+          this.scene?.entityManager.removeEntityById(projectile.id);
+        }
       }
     });
   }

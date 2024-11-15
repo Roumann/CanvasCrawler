@@ -1,8 +1,9 @@
-import { layerColliders } from "../physics/Collider";
 import { SpriteComponent } from "../rendering/Sprite";
 import { TSpriteOffsetComponent } from "../rendering/SpriteOffset";
 
 type WeaponType = "melee" | "ranged" | "aoe";
+
+// TODO COMPLETELY REWORK HOW I INITIALIZE THIS
 
 type TWeaponComponent = {
   info: {
@@ -16,7 +17,7 @@ type TWeaponComponent = {
     lifeTime: number; // TODO workout these three values - maybe i dont need all of them???
     cooldown: number;
     interval: number;
-    collider: { w: number; h: number; layer: layerColliders[] };
+    collider: { w: number; h: number };
     velocity: { vx: number; vy: number };
   };
   sprite: {
@@ -27,6 +28,7 @@ type TWeaponComponent = {
       currAnimation: string;
       spriteGridSize: { w: number; h: number };
       frameRate: number;
+      animationType: "loop" | "once" | "bounce";
     };
   };
 };
@@ -44,7 +46,7 @@ export class WeaponComponent {
     cooldown: number;
     interval: number;
 
-    collider: { w: number; h: number; layer: layerColliders[] };
+    collider: { w: number; h: number };
     velocity: { vx: number; vy: number };
   };
   sprite: {
@@ -55,6 +57,7 @@ export class WeaponComponent {
       currAnimation: string;
       spriteGridSize: { w: number; h: number };
       frameRate: number;
+      animationType: "loop" | "once" | "bounce";
     };
   };
 

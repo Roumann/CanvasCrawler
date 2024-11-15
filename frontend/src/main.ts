@@ -97,7 +97,7 @@ player
   .addComponent(
     new InventoryComponent({
       weapons: [
-        weaponFactory.createWeapon("fireball"),
+        // weaponFactory.createWeapon("fireball"),
         weaponFactory.createWeapon("sword"),
       ],
       items: [
@@ -161,6 +161,7 @@ function AddEnemies() {
           currentAnimation: "idle-right",
           spriteGridSize: { w: 32, h: 32 },
           frameRate: 16,
+          animationType: "loop",
         })
       )
       .addComponent(new SpriteOffsetComponent({ x: 8, y: 8 }))
