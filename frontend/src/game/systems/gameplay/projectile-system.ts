@@ -1,4 +1,5 @@
 import { ColliderComponent, PositionComponent } from "../../components";
+import { AnimationComponent } from "../../components/rendering/Animation";
 import { Entity, System } from "../../core";
 
 export class ProjectileSystem extends System {
@@ -6,8 +7,13 @@ export class ProjectileSystem extends System {
     super();
   }
 
+  // THIS SYSTEM SHOULD TAKE PROJECTILES SPAWNED BY ATTACK SYSTEM AND MOVE THEM, CHECK THEIR LIFETIME, CHECK IF THEY COLLIDE
+
   update(deltaTime: number) {
-    const projectiles = this.scene.entityManager.getEntitiesByTag("projectile");
+    const projectiles = this.scene.entityManager.getEntitiesWithComponents([
+      "DamageComponent",
+      "LifeTimeComponent",
+    ]);
     const enemies = this.scene.entityManager.getEntitiesByTag("enemy");
 
     projectiles.forEach((projectile) => {
@@ -68,11 +74,31 @@ export class ProjectileSystem extends System {
 
   resolveCollision(projectile: Entity, enemy: Entity) {
     const damage = projectile.getComponent("DamageComponent");
+    const hitTracking = projectile.getComponent("HitTrackingComponent");
+
     const health = enemy.getComponent("HealthComponent");
+    const animation = enemy.getComponent(
+      "AnimationComponent"
+    ) as AnimationComponent;
+
+    if (hitTracking) {
+      if (hitTracking.hasHit(enemy.id)) return;
+      hitTracking.addHit(enemy.id);
+      console.log(hitTracking.hitEnemies);
+    }
 
     health.health -= damage.value;
+    animation.currentAnimation = "damage";
 
-    if (health.health <= health.maxHealth) {
+    if (projectile.getComponent("TagComponent").tag === "projectile") {
+      this.scene.entityManager.removeEntityById(projectile.id);
+    }
+
+    if (health.health <= 0) {
+      if (hitTracking) {
+        hitTracking.remove(enemy.id);
+      }
+
       this.scene.entityManager.removeEntityById(enemy.id);
     }
   }

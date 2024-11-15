@@ -3,13 +3,26 @@ import { Entity } from "../core/Entity";
 export class EntityManager {
   entities: Entity[];
   nextId: number;
+  // prefabFactory: PrefabFactory;
 
   constructor() {
     // SYSTEM DOESNT DELET ENTITIES - ONLY MARKS THEM FOR DELETION
     // ADD ISALIVE TAG TO ENTITY AFTER RENDER IF FLAG FALSE = DELETE IT
     this.entities = []; // maybe use new Set()
     this.nextId = 1;
+    // this.prefabFactory = new PrefabFactory(this);
   }
+
+  // TODO - this could be a good way to add query to eachs system instead of
+  // class SearchComponent extends Component {
+  //   }
+  // }
+  //
+  // class SearchSystem extends System {
+  // query: Query<typeof SearchComponent>;
+  // constructor(world: World) {
+  //   this.query = world.query([TransformComponent, SearchComponent]);
+  // }
 
   createEntity() {
     const entity = new Entity(this.nextId++);
@@ -17,12 +30,27 @@ export class EntityManager {
     return entity;
   }
 
+  // createPrefab(prefab: any) {
+  //   return this.prefabFactory.createPrefab(prefab);
+  // }
+
   getEntityByTag(tag: string): Entity {
     return this.entities.filter((entity) => {
       const tagComponent = entity.getComponent("TagComponent");
       return tagComponent && tagComponent.tag === tag;
     })[0];
   }
+
+  // 2X faster change all queries to use basic for loops
+  // getEntityByTag2(tag: string): Entity | null {
+  //   for (let i = 0; i < this.entities.length; i++) {
+  //     const entityTag = this.entities[i].getComponent("TagComponent");
+  //     if (entityTag && entityTag.tag === tag) {
+  //       return this.entities[i];
+  //     }
+  //   }
+  //   return null;
+  // }
 
   getEntitiesByTag(tag: string): Entity[] {
     return this.entities.filter((entity) => {

@@ -8,23 +8,20 @@ import { AnimationComponent } from "../../components/rendering/Animation";
 import { System } from "../../core";
 
 type TRenderSystem = {
-  ctx: CanvasRenderingContext2D | null;
   debug?: boolean;
 };
 // TODO - add rendering order system
 export class RenderSystem extends System {
-  ctx: CanvasRenderingContext2D | null;
   debug: boolean;
 
-  constructor({ ctx, debug = false }: TRenderSystem) {
+  constructor({ debug = false }: TRenderSystem) {
     super();
-    this.ctx = ctx;
-
     this.debug = debug;
   }
 
   update(deltaTime: number) {
-    if (!this.ctx) return;
+    if (!this.scene || !this.scene.context) return;
+    const ctx = this.scene.context;
 
     const entities = this.scene.entityManager.getEntitiesWithComponents([
       "PositionComponent",
@@ -33,7 +30,7 @@ export class RenderSystem extends System {
       "SpriteOffsetComponent",
     ]);
 
-    this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
     entities.forEach((entity) => {
       const position = entity.getComponent(
@@ -61,7 +58,7 @@ export class RenderSystem extends System {
           offset.y = spriteOffset.y;
         }
 
-        if (sprite && sprite.isLoaded && this.ctx) {
+        if (sprite && sprite.isLoaded) {
           const animation = entity.getComponent(
             "AnimationComponent"
           ) as AnimationComponent;
@@ -75,11 +72,23 @@ export class RenderSystem extends System {
           }
 
           if (this.debug) {
-            this.ctx.strokeRect(cameraX, cameraY, sprite.size.w, sprite.size.h);
+            ctx.lineWidth = 0.5;
+            ctx.strokeRect(cameraX, cameraY, sprite.size.w, sprite.size.h);
+
+            ctx.fillText(entity.id.toString(), cameraX, cameraY);
+
+            const collider = entity.getComponent(
+              "ColliderComponent"
+            ) as ColliderComponent;
+            if (collider) {
+              ctx.strokeStyle = "yellow";
+              ctx.strokeRect(cameraX, cameraY, collider.w, collider.h);
+              ctx.strokeStyle = "black";
+            }
           }
 
-          this.ctx.imageSmoothingEnabled = false;
-          this.ctx.drawImage(
+          ctx.imageSmoothingEnabled = false;
+          ctx.drawImage(
             sprite.image,
             frameX * spriteGridSize.w + offset.x, // Animation frame selection goes here
             frameY * spriteGridSize.h + offset.y,
@@ -90,10 +99,6 @@ export class RenderSystem extends System {
             sprite.size.w,
             sprite.size.h
           );
-
-          if (animation) {
-            animation.animate();
-          }
         }
         // If no sprite, render a basic rectangle (e.g., for walls)
         else {
@@ -101,12 +106,12 @@ export class RenderSystem extends System {
             "ColliderComponent"
           ) as ColliderComponent;
 
-          if (!size || !this.ctx) return;
+          if (!size || !ctx) return;
 
           if (this.debug) {
-            this.ctx.fillStyle = this.debug ? "rgba(255, 0, 0, 0.5)" : "gray"; // Red if debug, otherwise gray
-            this.ctx.fillRect(cameraX, cameraY, size.w, size.h);
-            this.ctx.strokeRect(cameraX, cameraY, size.w, size.h);
+            ctx.fillStyle = this.debug ? "rgba(255, 0, 0, 0.5)" : "gray"; // Red if debug, otherwise gray
+            ctx.fillRect(cameraX, cameraY, size.w, size.h);
+            ctx.strokeRect(cameraX, cameraY, size.w, size.h);
           }
         }
       }

@@ -3,16 +3,16 @@ import { PassiveItemComponent } from "./PassiveItem";
 
 export type TInventoryComponent = {
   weapons: WeaponComponent[];
-  passiveItems: PassiveItemComponent[];
+  items: PassiveItemComponent[];
 };
 
 export class InventoryComponent {
   weapons: WeaponComponent[];
-  passiveItems: PassiveItemComponent[];
+  items: PassiveItemComponent[];
 
-  constructor({ weapons, passiveItems }: TInventoryComponent) {
+  constructor({ weapons, items }: TInventoryComponent) {
     this.weapons = [...weapons];
-    this.passiveItems = [...passiveItems];
+    this.items = [...items];
   }
 
   addWeapon(weapon: WeaponComponent) {
@@ -20,6 +20,6 @@ export class InventoryComponent {
   }
 
   addPassiveItem(passiveItem: PassiveItemComponent) {
-    this.passiveItems.push(passiveItem);
+    this.items.push(passiveItem);
   }
 }

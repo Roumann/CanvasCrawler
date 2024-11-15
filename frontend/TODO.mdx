@@ -1,3 +1,12 @@
+Priority:
+1 - player attacks (projectiles, sword, etc.)
+2 - collision / movement
+3 - archetypes
+4 - Event system
+5 - loot
+
+Better typescript types
+
 Camera
 
     - [x] Add camera
@@ -7,11 +16,26 @@ Camera
 Scene
 
     - [] maybe create a base scene that unless user creates his specific scene everything get rendered to
+    - [] When switching scenes - clear the old scene - create teardown function for scenes (remove all entities etc.) - and the create regular scene switching without teardown
 
-Archetypes
+Prefabs
 
-    - [] Decide on archetypes/prefabs - how to handle them, what the data should look like
-    - [] Add archetypes / archetype spawner
+    - [] Decide on Prefabs - how to handle them, what the data should look like
+    - [] Add Prefabs spawner
+
+    each scene will have its own prefabManager
+    first you will have JSON file with all the prefabs fro the specific scen
+    this will load and create dictionary of prefabs
+    so then you can just call scene.entityManager.createPrefab(prefabName) and it will create the entity with all the components
+
+Map
+
+    - [] Add tile map support (have both single image as background and tilemaps)
+    - [] Add procedural generation for tile maps
+
+AssetsManager
+
+     - [] Add assets manager
 
 Systems
 

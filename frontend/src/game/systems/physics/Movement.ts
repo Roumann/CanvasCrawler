@@ -8,9 +8,8 @@ export class MovementSystem extends System {
   pressedKeys: Set<string>;
   keyMap: { [key: string]: string };
   bounds: Rect;
-  context: CanvasRenderingContext2D | null;
 
-  constructor(ctx: CanvasRenderingContext2D | null) {
+  constructor() {
     super();
     this.pressedKeys = new Set();
     this.keyMap = {
@@ -20,7 +19,6 @@ export class MovementSystem extends System {
       ArrowDown: "down",
     };
 
-    this.context = ctx ?? null;
     this.bounds = new Rect({ x: 0, y: 0, w: 3200, h: 3200 });
 
     this.addEventListeners();
@@ -42,6 +40,8 @@ export class MovementSystem extends System {
 
   // TODO change the velocity instead of position
   update(deltaTime: number) {
+    if (!this.scene) return;
+
     const player = this.scene.entityManager.getEntityByTag("player");
 
     const position = player.getComponent("PositionComponent");
@@ -53,13 +53,14 @@ export class MovementSystem extends System {
 
     const animation = player.getComponent("AnimationComponent");
 
-    if (!position || !velocity || !size || !direction || !this.context) return;
+    if (!position || !velocity || !size || !direction) return;
 
     if (this.pressedKeys.size === 0) {
       this.setIdleAnimation(direction, animation);
       return;
     }
 
+    // TODO move animtaions from movement system to animation system
     this.pressedKeys.forEach((keyDirection) => {
       switch (keyDirection) {
         case "left":
@@ -86,6 +87,7 @@ export class MovementSystem extends System {
           }
 
           position.y -= velocity.vy * deltaTime;
+
           break;
         case "down":
           if (animation) {
@@ -94,6 +96,7 @@ export class MovementSystem extends System {
           }
 
           position.y += velocity.vy * deltaTime;
+
           break;
       }
     });

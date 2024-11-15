@@ -24,6 +24,8 @@ export class World {
     this.scenes = new Map<string, Scene>();
     this.currentScene = currentScene ?? null;
 
+    // TODO add event system here and pass to scenes (i already have the whole scene accesible in systems so i can just do this.scene.eventManager.emit())
+
     this.isPaused = isPaused ?? false;
     // add time managment here
     // timeElapsed etc.

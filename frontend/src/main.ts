@@ -29,6 +29,11 @@ import { DirectionComponent } from "./game/components/physics/DirectionComponent
 import { AnimationComponent } from "./game/components/rendering/Animation";
 import { playerAnimations } from "./game/animations/player";
 import { CameraFollowComponent } from "./game/components/rendering/CameraFollow";
+import { InventoryUISystem } from "./game/systems/rendering/InventoryUISystem";
+import { EventDispatcher } from "./game/core/Events";
+import { swordAnimation } from "./game/animations/sword";
+import { AnimationSystem } from "./game/systems/rendering/AnimationSystem";
+import { weaponFactory } from "./game/archetypes/weapons/WeaponFactory";
 
 const canvas = document.getElementById("game-canvas") as HTMLCanvasElement;
 const ctx = canvas.getContext("2d");
@@ -38,7 +43,7 @@ const world = new World({
   // change this to viewport
   width: 256,
   height: 256,
-  isPaused: false,
+  isPaused: false, // TODO Maybe move this to the scene? so when switching scenes it can be paused / or teardown
 });
 
 // Create Scene where all entities live
@@ -63,13 +68,14 @@ map
 // all of them will be auto updated in the game loop and run on entities in the scene
 // ORDER IS IMPORTANT!!!!!
 overworld.systemManager.addSystems([
-  new MovementSystem(ctx),
+  new MovementSystem(),
+  new AnimationSystem(),
   new WallCollisionSystem(),
   new EnemyCollisionSystem(),
   new PlayerAttackSystem(),
   new ProjectileSystem(),
-  // Not sure about this? passing ctx and camera to render system?
-  new RenderSystem({ ctx, debug: true }), // system has access to scene so it can take the ctx from there
+  new RenderSystem({ debug: true }),
+  // new InventoryUISystem({ context: ctx }),
 ]);
 
 // Add walls to the scene from Tiled exported file
@@ -93,14 +99,23 @@ for (let i = 0; i < 20; i++) {
         y: Math.random() * 1000,
       })
     )
-    .addComponent(new ColliderComponent({ w: 32, h: 32 }))
+    .addComponent(new ColliderComponent({ w: 16, h: 22 }))
     .addComponent(new VelocityComponent({ vx: 120, vy: 120 }))
-    .addComponent(new HealthComponent({ health: 100, maxHealth: 100 }))
+    .addComponent(new HealthComponent({ health: 100 })) // TODO change this
     .addComponent(new CollisionDamageComponent({ damage: 10 }))
     .addComponent(
+      new AnimationComponent({
+        animations: playerAnimations,
+        currentAnimation: "idle-right",
+        spriteGridSize: { w: 32, h: 32 },
+        frameRate: 16,
+      })
+    )
+    .addComponent(new SpriteOffsetComponent({ x: 8, y: 8 }))
+    .addComponent(
       new SpriteComponent({
-        src: "/characters/enemy1.png",
-        size: { w: 32, h: 32 },
+        src: "/characters/enemy_char.png",
+        size: { w: 15, h: 21 },
       })
     )
     .addComponent(new TagComponent({ tag: "enemy" }));
@@ -112,7 +127,7 @@ player
   .addComponent(new PositionComponent({ x: 10, y: 10 }))
   .addComponent(new ColliderComponent({ w: 16, h: 22 }))
   .addComponent(new VelocityComponent({ vx: 120, vy: 120 }))
-  .addComponent(new HealthComponent({ health: 100, maxHealth: 100 }))
+  .addComponent(new HealthComponent({ health: 100 }))
   .addComponent(
     new SpriteComponent({
       src: "/characters/char_4.png",
@@ -132,30 +147,10 @@ player
   .addComponent(
     new InventoryComponent({
       weapons: [
-        new WeaponComponent({
-          damage: 10,
-          range: 10,
-          size: { w: 32, h: 32 },
-          collider: { w: 32, h: 32 },
-          velocity: { vx: 60, vy: 60 },
-          lifeTime: 2,
-          tag: "projectile",
-          src: "/items/sword.png",
-        }),
-        new WeaponComponent({
-          damage: 5,
-          range: 10,
-          size: { w: 8, h: 8 },
-          collider: { w: 8, h: 8 },
-          velocity: { vx: 220, vy: 220 },
-          lifeTime: 2,
-          tag: "projectile",
-          src: "/items/gem.png",
-          direction: "right",
-          // TODO - add attack pattern - e.g. straight, random, both sides left/right or up/down etc.
-        }),
+        weaponFactory.createWeapon("fireball"),
+        weaponFactory.createWeapon("sword"),
       ],
-      passiveItems: [
+      items: [
         new PassiveItemComponent({
           name: "Heal",
           description: "Heals 10 health",
@@ -165,7 +160,8 @@ player
   )
   .addComponent(new DirectionComponent({ direction: "right" }))
   .addComponent(new CameraFollowComponent())
-  .addComponent(new TagComponent({ tag: "player" }));
+  .addComponent(new TagComponent({ tag: "player" }))
+  .addComponent(new EventDispatcher());
 
 // finally add the constructed scene to the game
 world.addScene(overworld);
@@ -173,9 +169,10 @@ world.addScene(overworld);
 // create a loop that will run the game
 let lastTime = 0;
 function gameLoop(timestamp: number) {
-  const deltaTime = (timestamp - lastTime) / 1000;
+  const deltaTime = (timestamp - lastTime) / 1000; // in seconds
   lastTime = timestamp;
 
+  // TODO not a fan of this
   world.start(deltaTime);
 
   requestAnimationFrame(gameLoop);

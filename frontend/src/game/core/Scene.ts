@@ -26,7 +26,6 @@ export class Scene {
     this.entityManager = new EntityManager();
     this.systemManager = new SystemManager(this);
 
-    // TODO - add camera to scene
     this.camera = new Camera({
       camera,
       context: context,
@@ -36,6 +35,7 @@ export class Scene {
   update(deltaTime: number) {
     this.systemManager.update(deltaTime);
 
+    // TODO maybe move this
     this.camera.update(this.entityManager);
   }
 

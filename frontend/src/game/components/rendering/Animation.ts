@@ -1,5 +1,5 @@
 export type TAnimationComponent = {
-  animations?: Map<string, any>;
+  animations?: Map<string, any> | null;
   currentAnimation?: string;
   spriteGridSize?: { w: number; h: number };
   frameRate?: number;
@@ -48,17 +48,5 @@ export class AnimationComponent {
       this.currentAnimationFrame = 0;
     }
     return frame[this.currentAnimationFrame];
-  }
-
-  animate() {
-    if (this.frameProgress > 0) {
-      this.frameProgress -= 1;
-      return;
-    }
-    this.frameProgress = this.frameRate;
-    this.currentAnimationFrame += 1;
-    if (this.frame === undefined) {
-      this.currentAnimationFrame = 0;
-    }
   }
 }

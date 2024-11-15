@@ -6,7 +6,7 @@ import {
   SpriteComponent,
   TagComponent,
 } from "../../components";
-import { System } from "../../core";
+import { Entity, System } from "../../core";
 
 export class EnemyCollisionSystem extends System {
   constructor() {

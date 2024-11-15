@@ -1,27 +1,71 @@
-import { Player } from "../../core/Player";
+import { swordAnimation } from "../../animations/sword";
+import { SpriteComponent, WeaponComponent } from "../../components";
 
-export class WeaponFactory {
-  //TODO create Player class
-  static createWeapon(type: string, player: Player) {
+type WeaponType = "sword" | "fireball";
+
+class WeaponFactory {
+  createWeapon(type: WeaponType) {
     switch (type) {
-      case "whip":
-      // return new Sword(player, {
-      //   damage: 10,
-      //   cooldown: 2.0,
-      //   level: 1,
-      //   maxLevel: 8,
-      //   area: 100,
-      // });
-      //   case "throwingKnife":
-      //     return new ThrowingKnife(player, {
-      //       damage: 15,
-      //       cooldown: 1.0,
-      //       level: 1,
-      //       maxLevel: 8,
-      //       projectileSpeed: 300,
-      //     });
+      case "sword":
+        return new WeaponComponent({
+          info: {
+            name: "sword",
+            desc: "A basic sword",
+          },
+          config: {
+            type: "melee",
+            damage: 10,
+            range: 10,
+            lifeTime: 0.3,
+            cooldown: 1,
+            interval: 1,
+            collider: { w: 32, h: 32 },
+            velocity: { vx: 0, vy: 0 },
+          },
+          sprite: {
+            img: new SpriteComponent({
+              src: "/items/sword.png",
+              size: { w: 32, h: 32 },
+            }),
+            offset: { x: 8, y: 8 },
+            animation: {
+              animations: swordAnimation,
+              currAnimation: "slash",
+              spriteGridSize: { w: 32, h: 32 },
+              frameRate: 24,
+            },
+          },
+        });
+
+      case "fireball":
+        return new WeaponComponent({
+          info: {
+            name: "Fireball",
+            desc: "A fireball",
+          },
+          config: {
+            type: "ranged",
+            damage: 50,
+            range: 10,
+            lifeTime: 2,
+            cooldown: 0.5,
+            interval: 0.5,
+            collider: { w: 32, h: 15 },
+            velocity: { vx: 120, vy: 120 },
+          },
+          sprite: {
+            img: new SpriteComponent({
+              src: "/weapons/projectiles/fireball.png",
+              size: { w: 32, h: 15 },
+            }),
+            offset: { x: 0, y: 8 },
+          },
+        });
+
       default:
         throw new Error(`Unknown weapon type: ${type}`);
     }
   }
 }
+
+export const weaponFactory = new WeaponFactory();
