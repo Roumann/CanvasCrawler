@@ -88,7 +88,8 @@ player
       animations: playerAnimations,
       currentAnimation: "idle-right",
       spriteGridSize: { w: 32, h: 32 },
-      frameRate: 16,
+      frameRate: 12,
+      animationType: "loop",
     })
   )
   .addComponent(new DirectionComponent({ direction: "right" }))

@@ -3,6 +3,7 @@ export type TAnimationComponent = {
   currentAnimation?: string;
   spriteGridSize?: { w: number; h: number };
   frameRate?: number;
+  animationType?: "loop" | "once" | "bounce";
 };
 
 export class AnimationComponent {
@@ -12,12 +13,15 @@ export class AnimationComponent {
   frameProgress: number;
   currentAnimationFrame: number;
   spriteGridSize: { w: number; h: number };
+  isCompleted: boolean;
+  animationType: "loop" | "once" | "bounce";
 
   constructor({
     animations,
     currentAnimation,
     spriteGridSize,
     frameRate,
+    animationType,
   }: TAnimationComponent) {
     this.animations =
       animations ??
@@ -35,18 +39,35 @@ export class AnimationComponent {
     this.currentAnimationFrame = 0;
     this.frameRate = frameRate ?? 32;
     this.frameProgress = this.frameRate;
+    this.isCompleted = false;
+    this.animationType = animationType ?? "loop";
   }
 
   get frame() {
+    if (this.isCompleted) return [0, 0];
+
     const frame = this.animations.get(this.currentAnimation);
 
     if (frame === undefined) {
       return [0, 0];
     }
 
-    if (this.currentAnimationFrame >= frame.length) {
-      this.currentAnimationFrame = 0;
+    switch (this.animationType) {
+      case "loop":
+        if (this.currentAnimationFrame >= frame.length) {
+          this.currentAnimationFrame = 0;
+        }
+        break;
+      case "once":
+        if (this.currentAnimationFrame >= frame.length) {
+          this.isCompleted = true;
+        }
+        break;
+      case "bounce":
+        break;
+      default:
     }
+
     return frame[this.currentAnimationFrame];
   }
 }
