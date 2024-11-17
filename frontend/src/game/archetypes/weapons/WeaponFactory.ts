@@ -39,7 +39,7 @@ class WeaponFactory {
               currentAnimation: "slash" as SlashAnimation,
               frameSize: { w: 64, h: 32 },
               frameRate: 8,
-              animationType: "once",
+              loop: false,
             },
           },
         });

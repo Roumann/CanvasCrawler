@@ -11,8 +11,6 @@ export class AnimationSystem extends System {
     ]);
     if (!entities) return;
 
-    console.log(entities);
-
     for (const entity of entities) {
       const animation = entity.getComponent(
         "AnimationComponent"
@@ -28,15 +26,3 @@ export class AnimationSystem extends System {
     }
   }
 }
-
-// if (animation.animationProgress >= 0) {
-//   animation.animationProgress -= 1;
-// } else {
-//   animation.animationProgress = animation.frameRate;
-//   animation.currentFrame += 1;
-
-//   if (animation.currentFrame >= animation.frame.length) {
-//     animation.currentFrame = 0;
-//     animation.isCompleted = true;
-//   }
-// }

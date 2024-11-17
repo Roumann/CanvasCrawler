@@ -59,20 +59,20 @@ export class ProjectileSystem extends System {
 
       // Reduce lifetime and check if expired
       lifetime.time -= deltaTime;
-      if (lifetime.time <= 0) {
-        if (animation) {
-          if (animation.isCompleted) {
-            this.entitiesToDelete.push(projectile.id);
-          }
-          return;
-        } else {
-          this.entitiesToDelete.push(projectile.id);
-        }
-      }
+      // if (lifetime.time <= 0) {
+      //   if (animation) {
+      //     if (animation.isCompleted) {
+      //       this.entitiesToDelete.push(projectile.id);
+      //     }
+      //     return;
+      //   } else {
+      //     this.entitiesToDelete.push(projectile.id);
+      //   }
+      // }
     });
   }
 
-  postUpdate(): void {
+  cleanUp(): void {
     for (let i = 0; i < this.entitiesToDelete.length; i++) {
       this.scene.entityManager.removeEntityById(this.entitiesToDelete[i]);
       this.entitiesToDelete.splice(i, 1);

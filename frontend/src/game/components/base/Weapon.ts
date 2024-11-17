@@ -28,7 +28,7 @@ type TWeaponComponent = {
       currentAnimation: string;
       frameSize: { w: number; h: number };
       frameRate: number;
-      animationType: "loop" | "once" | "bounce";
+      loop: boolean;
     };
   };
 };
@@ -57,7 +57,7 @@ export class WeaponComponent {
       currentAnimation: string;
       frameSize: { w: number; h: number };
       frameRate: number;
-      animationType: "loop" | "once" | "bounce";
+      loop: boolean;
     };
   };
 

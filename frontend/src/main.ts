@@ -92,7 +92,7 @@ player
       currentAnimation: "idle-right" as PlayerAnimations,
       frameSize: { w: 32, h: 32 },
       frameRate: 16,
-      animationType: "loop",
+      loop: true,
     })
   )
   .addComponent(new DirectionComponent({ direction: "right" }))
@@ -165,7 +165,7 @@ function AddEnemies() {
           currentAnimation: "idle-right",
           frameSize: { w: 32, h: 32 },
           frameRate: 16,
-          animationType: "loop",
+          loop: true,
         })
       )
       .addComponent(new SpriteOffsetComponent({ x: 8, y: 8 }))

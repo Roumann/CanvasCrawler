@@ -16,7 +16,7 @@ export class SystemManager {
     }
 
     for (const system of this.systems) {
-      system.postUpdate();
+      system.cleanUp();
     }
   }
 

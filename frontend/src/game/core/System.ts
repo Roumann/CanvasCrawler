@@ -24,5 +24,5 @@ export abstract class System {
    * Called after update functions in all systems have been called.
    * This is where you should do any cleanup.
    */
-  postUpdate() {}
+  cleanUp() {}
 }

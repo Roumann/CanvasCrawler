@@ -3,7 +3,7 @@ export type TAnimationComponent = {
   currentAnimation: string;
   frameSize: { w: number; h: number };
   frameRate: number;
-  animationType: "loop" | "once" | "bounce";
+  loop: boolean;
 };
 
 export class AnimationComponent {
@@ -14,14 +14,14 @@ export class AnimationComponent {
   frameRate: number;
   animationProgress: number;
   isCompleted: boolean;
-  // animationType: "loop" | "once" | "bounce";
+  loop: boolean;
 
   constructor({
     animations,
     currentAnimation,
     frameSize,
     frameRate,
-    animationType,
+    loop,
   }: TAnimationComponent) {
     this.animations =
       animations ??
@@ -40,6 +40,7 @@ export class AnimationComponent {
     this.frameRate = frameRate; // 32
     this.animationProgress = this.frameRate; // this is like a buffer that counts down to 0 so every X[FrameRate] frames sprite will change
     this.isCompleted = false;
+    this.loop = loop;
   }
 
   get frame() {
@@ -49,33 +50,11 @@ export class AnimationComponent {
       this.currentFrame = 0;
       this.isCompleted = true;
     }
+
+    if (!this.loop && this.isCompleted) {
+      return frame[frame.length - 1];
+    }
+
     return frame[this.currentFrame];
   }
-
-  // get frame() {
-  //   if (this.isCompleted) return [0, 0];
-
-  //   const frame = this.animations.get(this.currentAnimation);
-  //   if (frame === undefined) {
-  //     return [0, 0];
-  //   }
-
-  //   switch (this.animationType) {
-  //     case "loop":
-  //       if (this.currentAnimationFrame >= frame.length) {
-  //         this.currentAnimationFrame = 0;
-  //       }
-  //       break;
-  //     case "once":
-  //       if (this.currentAnimationFrame >= frame.length) {
-  //         this.isCompleted = true;
-  //       }
-  //       break;
-  //     case "bounce":
-  //       break;
-  //     default:
-  //   }
-
-  //   return frame[this.currentAnimationFrame];
-  // }
 }
