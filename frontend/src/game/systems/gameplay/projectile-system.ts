@@ -1,14 +1,12 @@
-import {
-  ColliderComponent,
-  PositionComponent,
-  WeaponComponent,
-} from "../../components";
+import { ColliderComponent, PositionComponent } from "../../components";
 import { AnimationComponent } from "../../components/rendering/Animation";
 import { Entity, System } from "../../core";
 
 export class ProjectileSystem extends System {
+  entitiesToDelete: number[] = [];
   constructor() {
     super();
+    this.entitiesToDelete = [];
   }
 
   // THIS SYSTEM SHOULD TAKE PROJECTILES SPAWNED BY ATTACK SYSTEM AND MOVE THEM, CHECK THEIR LIFETIME, CHECK IF THEY COLLIDE
@@ -32,14 +30,7 @@ export class ProjectileSystem extends System {
         "AnimationComponent"
       ) as AnimationComponent;
 
-      if (
-        !position ||
-        !velocity ||
-        !lifetime ||
-        !direction ||
-        !collider ||
-        !animation
-      )
+      if (!position || !velocity || !lifetime || !direction || !collider)
         return;
 
       switch (direction.direction) {
@@ -69,11 +60,23 @@ export class ProjectileSystem extends System {
       // Reduce lifetime and check if expired
       lifetime.time -= deltaTime;
       if (lifetime.time <= 0) {
-        if (animation.isCompleted) {
-          this.scene?.entityManager.removeEntityById(projectile.id);
+        if (animation) {
+          if (animation.isCompleted) {
+            this.entitiesToDelete.push(projectile.id);
+          }
+          return;
+        } else {
+          this.entitiesToDelete.push(projectile.id);
         }
       }
     });
+  }
+
+  postUpdate(): void {
+    for (let i = 0; i < this.entitiesToDelete.length; i++) {
+      this.scene.entityManager.removeEntityById(this.entitiesToDelete[i]);
+      this.entitiesToDelete.splice(i, 1);
+    }
   }
 
   isColliding(

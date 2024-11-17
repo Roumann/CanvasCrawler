@@ -84,11 +84,11 @@ export class RenderSystem extends System {
           ) as AnimationComponent;
 
           let [frameX, frameY] = [0, 0];
-          let spriteGridSize = { w: 0, h: 0 };
+          let frameSize = { w: 0, h: 0 };
 
           if (animation) {
             [frameX, frameY] = animation.frame;
-            spriteGridSize = animation.spriteGridSize;
+            frameSize = animation.frameSize;
           }
 
           if (this.debug) {
@@ -110,8 +110,8 @@ export class RenderSystem extends System {
           ctx.imageSmoothingEnabled = false;
           ctx.drawImage(
             sprite.image,
-            frameX * spriteGridSize.w + offset.x, // Animation frame selection goes here
-            frameY * spriteGridSize.h + offset.y,
+            frameX * frameSize.w + offset.x, // Animation frame selection goes here
+            frameY * frameSize.h + offset.y,
             sprite.size.w,
             sprite.size.h,
             cameraX,

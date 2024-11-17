@@ -1,5 +1,10 @@
+import { SlashAnimation, slashAnimation } from "../../animations/slash";
 import { swordAnimation } from "../../animations/sword";
-import { SpriteComponent, WeaponComponent } from "../../components";
+import {
+  AnimationComponent,
+  SpriteComponent,
+  WeaponComponent,
+} from "../../components";
 
 type WeaponType = "sword" | "fireball";
 
@@ -15,24 +20,24 @@ class WeaponFactory {
           },
           config: {
             type: "melee",
-            damage: 10,
+            damage: 25, // TODO - like sprite
             range: 10,
-            lifeTime: 0.3,
+            lifeTime: 0.3, // TODO - like sprite
             cooldown: 1,
             interval: 1,
-            collider: { w: 32, h: 32 },
-            velocity: { vx: 0, vy: 0 },
+            collider: { w: 64, h: 32 }, // TODO - like sprite
+            velocity: { vx: 0, vy: 0 }, // TODO - like sprite
           },
           sprite: {
             img: new SpriteComponent({
-              src: "/items/sword.png",
-              size: { w: 32, h: 32 },
+              src: "/weapons/projectiles/slash.png",
+              size: { w: 64, h: 32 },
             }),
-            offset: { x: 8, y: 8 },
+            offset: { x: 2, y: 2 },
             animation: {
-              animations: swordAnimation,
-              currAnimation: "slash",
-              spriteGridSize: { w: 32, h: 32 },
+              animations: slashAnimation,
+              currentAnimation: "slash" as SlashAnimation,
+              frameSize: { w: 64, h: 32 },
               frameRate: 8,
               animationType: "once",
             },

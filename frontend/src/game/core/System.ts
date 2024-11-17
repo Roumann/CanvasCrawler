@@ -19,4 +19,10 @@ export abstract class System {
   }
 
   abstract update(...args: any[]): void;
+
+  /**
+   * Called after update functions in all systems have been called.
+   * This is where you should do any cleanup.
+   */
+  postUpdate() {}
 }

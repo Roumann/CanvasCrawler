@@ -87,14 +87,7 @@ export class PlayerAttackSystem extends System {
       .addComponent(new TagComponent({ tag: "melee" }));
 
     if (weapon.sprite.animation) {
-      meleeAttack.addComponent(
-        new AnimationComponent({
-          animations: weapon.sprite.animation.animations,
-          frameRate: weapon.sprite.animation.frameRate,
-          currentAnimation: weapon.sprite.animation.currAnimation,
-          animationType: weapon.sprite.animation.animationType,
-        })
-      );
+      meleeAttack.addComponent(new AnimationComponent(weapon.sprite.animation));
     }
   }
 

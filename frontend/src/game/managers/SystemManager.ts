@@ -1,6 +1,5 @@
 import { Scene } from "../core";
 import { System } from "../core/System";
-import { EntityManager } from "./EntityManager";
 
 export class SystemManager {
   systems: System[];
@@ -11,10 +10,14 @@ export class SystemManager {
     this.nextId = 1;
   }
 
-  update(deltaTime: number) {
-    this.systems.forEach((system) => {
+  start(deltaTime: number) {
+    for (const system of this.systems) {
       system.update(deltaTime);
-    });
+    }
+
+    for (const system of this.systems) {
+      system.postUpdate();
+    }
   }
 
   addSystem(system: System) {

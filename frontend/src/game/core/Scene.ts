@@ -45,7 +45,7 @@ export class Scene {
   }
 
   update(deltaTime: number) {
-    this.systemManager.update(deltaTime);
+    this.systemManager.start(deltaTime);
 
     // TODO maybe move this
     this.camera.update(this.entityManager);

@@ -24,15 +24,18 @@ import {
   SpriteOffsetComponent,
   TagComponent,
   VelocityComponent,
+  WeaponComponent,
 } from "./game/components";
 
-import { playerAnimations } from "./game/animations/player";
+import { PlayerAnimations, playerAnimations } from "./game/animations/player";
 import { EventDispatcher } from "./game/core/Events";
 import { weaponFactory } from "./game/archetypes/weapons/WeaponFactory";
 import walls from "./game/config/map/mapa_1.json";
 
 import { InventoryUISystem } from "./game/systems/rendering/InventoryUISystem";
 import { CollisionSystem } from "./game/systems/physics/Collision";
+import { SlashAnimation, slashAnimation } from "./game/animations/slash";
+import { TestAnimation, testAnimation } from "./game/animations/test";
 
 const canvas = document.getElementById("game-canvas") as HTMLCanvasElement;
 const ctx = canvas.getContext("2d");
@@ -47,6 +50,9 @@ const overworld = new Scene({
   camera: {
     bounds: { min: 0, max: 3200 },
   },
+  // TODO - add option to creating the world
+  // Either what i have right now static image and array of walls or
+  // allow user to use Tilemap and create the world from it
   background: {
     src: "/maps/mapa1.png",
     size: { w: 3200, h: 3200 },
@@ -54,9 +60,6 @@ const overworld = new Scene({
   walls: walls,
 });
 
-// Add all the systems to the scene
-// all of them will be auto updated in the game loop and run on entities in the scene
-// ORDER IS IMPORTANT!!!!!
 overworld.systemManager.addSystems([
   new MovementSystem(),
   new AnimationSystem(),
@@ -86,9 +89,9 @@ player
   .addComponent(
     new AnimationComponent({
       animations: playerAnimations,
-      currentAnimation: "idle-right",
-      spriteGridSize: { w: 32, h: 32 },
-      frameRate: 12,
+      currentAnimation: "idle-right" as PlayerAnimations,
+      frameSize: { w: 32, h: 32 },
+      frameRate: 16,
       animationType: "loop",
     })
   )
@@ -137,6 +140,7 @@ function gameLoop(timestamp: number) {
 requestAnimationFrame(gameLoop);
 
 function AddEnemies() {
+  console.log("adding enemies");
   for (let i = 0; i < 20; i++) {
     overworld.entityManager
       .createEntity()
@@ -159,7 +163,7 @@ function AddEnemies() {
         new AnimationComponent({
           animations: playerAnimations,
           currentAnimation: "idle-right",
-          spriteGridSize: { w: 32, h: 32 },
+          frameSize: { w: 32, h: 32 },
           frameRate: 16,
           animationType: "loop",
         })

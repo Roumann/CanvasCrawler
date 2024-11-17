@@ -11,21 +11,32 @@ export class AnimationSystem extends System {
     ]);
     if (!entities) return;
 
-    entities.forEach((entity) => {
+    console.log(entities);
+
+    for (const entity of entities) {
       const animation = entity.getComponent(
         "AnimationComponent"
       ) as AnimationComponent;
-      if (!animation) return;
+      if (!animation) continue;
 
-      if (animation.frameProgress > 0) {
-        animation.frameProgress -= 1;
-        return;
+      if (animation.animationProgress >= 0) {
+        animation.animationProgress -= 1;
+      } else {
+        animation.animationProgress = animation.frameRate;
+        animation.currentFrame += 1;
       }
-      animation.frameProgress = animation.frameRate;
-      animation.currentAnimationFrame += 1;
-      if (animation.frame === undefined) {
-        animation.currentAnimationFrame = 0;
-      }
-    });
+    }
   }
 }
+
+// if (animation.animationProgress >= 0) {
+//   animation.animationProgress -= 1;
+// } else {
+//   animation.animationProgress = animation.frameRate;
+//   animation.currentFrame += 1;
+
+//   if (animation.currentFrame >= animation.frame.length) {
+//     animation.currentFrame = 0;
+//     animation.isCompleted = true;
+//   }
+// }
