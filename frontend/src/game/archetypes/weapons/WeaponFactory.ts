@@ -20,13 +20,13 @@ class WeaponFactory {
           },
           config: {
             type: "melee",
-            damage: 25, // TODO - like sprite
+            damage: 25,
             range: 10,
-            lifeTime: 0.3, // TODO - like sprite
+            lifeTime: 0.3,
             cooldown: 1,
             interval: 1,
-            collider: { w: 64, h: 32 }, // TODO - like sprite
-            velocity: { vx: 0, vy: 0 }, // TODO - like sprite
+            collider: { w: 64, h: 32 }, // TODO these numbers are weird - not sure what controlls what - do i need all of them???
+            velocity: { vx: 0, vy: 0 },
           },
           sprite: {
             img: new SpriteComponent({
@@ -38,7 +38,7 @@ class WeaponFactory {
               animations: slashAnimation,
               currentAnimation: "slash" as SlashAnimation,
               frameSize: { w: 64, h: 32 },
-              frameRate: 8,
+              frameRate: 4,
               loop: false,
             },
           },
@@ -55,8 +55,8 @@ class WeaponFactory {
             damage: 50,
             range: 10,
             lifeTime: 2,
-            cooldown: 0.5,
-            interval: 0.5,
+            cooldown: 0.5, // TODO these numbers are weird - not sure what controls what - do i need all of them???
+            interval: 2,
             collider: { w: 32, h: 15 },
             velocity: { vx: 120, vy: 120 },
           },

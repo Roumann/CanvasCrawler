@@ -108,6 +108,7 @@ export class MovementSystem extends System {
     direction: DirectionComponent,
     animation: AnimationComponent
   ) {
+    if (!animation) return;
     const idleDir = direction.direction === "left" ? "left" : "right";
     animation.currentAnimation = `idle-${idleDir}`;
   }

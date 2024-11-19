@@ -22,6 +22,24 @@ export class PlayerAttackSystem extends System {
 
   // THIS SYSTEM SHOULD ONLY TAKE CARE OF LOOPING THROUGH WEAPONS AND SPAWNING PROJECTILES
 
+  // TODO - Create a behavior component that holds any specific behaviors for the weapon
+  // for example, chain reaction - find enemies in range and deal damage to them
+  // or fire aspect - add a statusEffect component to the hit enemy and deal damage to them etc.
+  // FLOW:
+  // call the attack func
+  // determine what type of weapon it is - melee, ranged, etc.
+  // do the attack
+  // last check for behaviors
+  // if there are behaviors, do them
+
+  // --- OR ---
+
+  // maybe create separate system for behaviors
+  // and then the weapon would only have simple info about the behavior
+  // and just put a statusComponent on the enemy which then the system would query
+
+  // TODO think about this more
+
   update(deltaTime: number) {
     const player = this.scene.entityManager.getEntitiesByTag("player")[0];
     const inventory = player.getComponent(

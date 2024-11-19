@@ -100,7 +100,7 @@ player
   .addComponent(
     new InventoryComponent({
       weapons: [
-        // weaponFactory.createWeapon("fireball"),
+        weaponFactory.createWeapon("fireball"),
         weaponFactory.createWeapon("sword"),
       ],
       items: [

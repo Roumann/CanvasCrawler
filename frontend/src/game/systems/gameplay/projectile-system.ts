@@ -1,3 +1,4 @@
+import { PlayerAnimations } from "../../animations/player";
 import { ColliderComponent, PositionComponent } from "../../components";
 import { AnimationComponent } from "../../components/rendering/Animation";
 import { Entity, System } from "../../core";
@@ -28,7 +29,7 @@ export class ProjectileSystem extends System {
       const direction = projectile.getComponent("DirectionComponent");
       const animation = projectile.getComponent(
         "AnimationComponent"
-      ) as AnimationComponent;
+      ) as AnimationComponent<"default">;
 
       if (!position || !velocity || !lifetime || !direction || !collider)
         return;
@@ -59,16 +60,16 @@ export class ProjectileSystem extends System {
 
       // Reduce lifetime and check if expired
       lifetime.time -= deltaTime;
-      // if (lifetime.time <= 0) {
-      //   if (animation) {
-      //     if (animation.isCompleted) {
-      //       this.entitiesToDelete.push(projectile.id);
-      //     }
-      //     return;
-      //   } else {
-      //     this.entitiesToDelete.push(projectile.id);
-      //   }
-      // }
+      if (lifetime.time <= 0) {
+        if (animation) {
+          if (animation.isCompleted) {
+            this.entitiesToDelete.push(projectile.id);
+          }
+          return;
+        } else {
+          this.entitiesToDelete.push(projectile.id);
+        }
+      }
     });
   }
 
@@ -100,7 +101,7 @@ export class ProjectileSystem extends System {
     const health = enemy.getComponent("HealthComponent");
     const animation = enemy.getComponent(
       "AnimationComponent"
-    ) as AnimationComponent;
+    ) as AnimationComponent<PlayerAnimations>;
 
     if (hitTracking) {
       if (hitTracking.hasHit(enemy.id)) return;
@@ -109,7 +110,7 @@ export class ProjectileSystem extends System {
     }
 
     health.health -= damage.value;
-    animation.currentAnimation = "damage";
+    animation.Frame = "damage";
 
     if (projectile.getComponent("TagComponent").tag === "projectile") {
       this.scene.entityManager.removeEntityById(projectile.id);
