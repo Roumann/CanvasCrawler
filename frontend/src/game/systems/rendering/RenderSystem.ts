@@ -1,11 +1,11 @@
+import { System } from "../../../engine/core";
 import {
   ColliderComponent,
   PositionComponent,
   SpriteComponent,
   SpriteOffsetComponent,
 } from "../../components";
-import { AnimationComponent } from "../../components/rendering/Animation";
-import { System } from "../../core";
+import { AnimationComponent } from "../../components/Animation";
 
 type TRenderSystem = {
   debug?: boolean;
@@ -19,7 +19,7 @@ export class RenderSystem extends System {
     this.debug = debug;
   }
 
-  update(deltaTime: number) {
+  update() {
     if (!this.scene || !this.scene.context) return;
     const ctx = this.scene.context;
 
@@ -36,8 +36,8 @@ export class RenderSystem extends System {
     if (sceneBackground) {
       const position = sceneBackground.position;
 
-      const cameraX = position.x - this.scene.camera.pos.x;
-      const cameraY = position.y - this.scene.camera.pos.y;
+      const cameraX = position.pos.x - this.scene.camera.pos.x;
+      const cameraY = position.pos.y - this.scene.camera.pos.y;
 
       ctx.drawImage(
         sceneBackground.background.image,
@@ -53,12 +53,12 @@ export class RenderSystem extends System {
     }
 
     entities.forEach((entity) => {
-      const position = entity.getComponent(
-        "PositionComponent"
-      ) as PositionComponent;
+      const position =
+        entity.getComponent<PositionComponent>("PositionComponent");
+      if (!position) return;
 
-      const cameraX = position.x - this.scene.camera.pos.x;
-      const cameraY = position.y - this.scene.camera.pos.y;
+      const cameraX = position.pos.x - this.scene.camera.pos.x;
+      const cameraY = position.pos.y - this.scene.camera.pos.y;
 
       let offset = {
         x: 0,
@@ -66,12 +66,10 @@ export class RenderSystem extends System {
       };
 
       if (position) {
-        const sprite = entity.getComponent(
-          "SpriteComponent"
-        ) as SpriteComponent;
-        const spriteOffset = entity.getComponent(
+        const sprite = entity.getComponent<SpriteComponent>("SpriteComponent");
+        const spriteOffset = entity.getComponent<SpriteOffsetComponent>(
           "SpriteOffsetComponent"
-        ) as SpriteOffsetComponent;
+        );
 
         if (spriteOffset) {
           offset.x = spriteOffset.x;
@@ -79,9 +77,8 @@ export class RenderSystem extends System {
         }
 
         if (sprite && sprite.isLoaded) {
-          const animation = entity.getComponent(
-            "AnimationComponent"
-          ) as AnimationComponent;
+          const animation =
+            entity.getComponent<AnimationComponent<any>>("AnimationComponent");
 
           let [frameX, frameY] = [0, 0];
           let frameSize = { w: 0, h: 0 };
@@ -97,9 +94,9 @@ export class RenderSystem extends System {
 
             ctx.fillText(entity.id.toString(), cameraX, cameraY);
 
-            const collider = entity.getComponent(
-              "ColliderComponent"
-            ) as ColliderComponent;
+            const collider =
+              entity.getComponent<ColliderComponent>("ColliderComponent");
+
             if (collider) {
               ctx.strokeStyle = "yellow";
               ctx.strokeRect(cameraX, cameraY, collider.w, collider.h);
@@ -114,24 +111,22 @@ export class RenderSystem extends System {
             frameY * frameSize.h + offset.y,
             sprite.size.w,
             sprite.size.h,
-            cameraX,
-            cameraY,
+            Math.floor(cameraX),
+            Math.floor(cameraY),
             sprite.size.w,
             sprite.size.h
           );
         }
         // If no sprite, render a basic rectangle (e.g., for walls)
         else {
-          const size = entity.getComponent(
-            "ColliderComponent"
-          ) as ColliderComponent;
-
-          if (!size || !ctx) return;
+          const collider =
+            entity.getComponent<ColliderComponent>("ColliderComponent");
+          if (!collider || !ctx) return;
 
           if (this.debug) {
-            ctx.fillStyle = this.debug ? "rgba(255, 0, 0, 0.5)" : "gray"; // Red if debug, otherwise gray
-            ctx.fillRect(cameraX, cameraY, size.w, size.h);
-            ctx.strokeRect(cameraX, cameraY, size.w, size.h);
+            ctx.fillStyle = this.debug ? "rgba(255, 0, 0, 0.5)" : "gray";
+            ctx.fillRect(cameraX, cameraY, collider.w, collider.h);
+            ctx.strokeRect(cameraX, cameraY, collider.w, collider.h);
           }
         }
       }

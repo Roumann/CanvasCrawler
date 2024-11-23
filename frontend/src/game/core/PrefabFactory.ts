@@ -1,4 +1,4 @@
-import { EntityManager } from "../managers/EntityManager";
+import { EntityManager } from "../../engine/core";
 
 export class PrefabFactory {
   ComponentDictionary: Map<string, any>;

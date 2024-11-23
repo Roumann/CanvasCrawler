@@ -1,7 +1,18 @@
 import { PlayerAnimations } from "../../animations/player";
-import { ColliderComponent, PositionComponent } from "../../components";
-import { AnimationComponent } from "../../components/rendering/Animation";
-import { Entity, System } from "../../core";
+import {
+  ColliderComponent,
+  DirectionComponent,
+  HealthComponent,
+  PositionComponent,
+  TagComponent,
+  VelocityComponent,
+} from "../../components";
+import { DamageComponent } from "../../components/DamageComponent";
+import { HitTrackingComponent } from "../../components/HitTrackingComponent";
+import { LifeTimeComponent } from "../../components/LifeTimeComponent";
+import { AccelerationComponent } from "../../components/Acceleration";
+import { AnimationComponent } from "../../components/Animation";
+import { Entity, System } from "../../../engine/core";
 
 export class ProjectileSystem extends System {
   entitiesToDelete: number[] = [];
@@ -22,45 +33,67 @@ export class ProjectileSystem extends System {
     const enemies = this.scene.entityManager.getEntitiesByTag("enemy");
 
     projectiles.forEach((projectile) => {
-      const position = projectile.getComponent("PositionComponent");
-      const collider = projectile.getComponent("ColliderComponent");
-      const velocity = projectile.getComponent("VelocityComponent");
-      const lifetime = projectile.getComponent("LifeTimeComponent");
-      const direction = projectile.getComponent("DirectionComponent");
-      const animation = projectile.getComponent(
-        "AnimationComponent"
-      ) as AnimationComponent<"default">;
+      const position =
+        projectile.getComponent<PositionComponent>("PositionComponent");
+      const collider =
+        projectile.getComponent<ColliderComponent>("ColliderComponent");
+      const velocity =
+        projectile.getComponent<VelocityComponent>("VelocityComponent");
+      const acceleration = projectile.getComponent<AccelerationComponent>(
+        "AccelerationComponent"
+      );
+      const lifetime =
+        projectile.getComponent<LifeTimeComponent>("LifeTimeComponent");
+      const direction =
+        projectile.getComponent<DirectionComponent>("DirectionComponent");
+      const animation =
+        projectile.getComponent<AnimationComponent<any>>("AnimationComponent");
 
-      if (!position || !velocity || !lifetime || !direction || !collider)
+      if (
+        !position ||
+        !velocity ||
+        !lifetime ||
+        !direction ||
+        !collider ||
+        !acceleration
+      )
         return;
+
+      // sub the playe / enemy vectors
+      // normalize them
+      // set the fireballs velocity (this moves it)
 
       switch (direction.direction) {
         case "left":
-          position.x -= velocity.vx * deltaTime;
+          position.pos.x -= velocity.vel.x * deltaTime;
           break;
         case "right":
-          position.x += velocity.vx * deltaTime;
+          position.pos.x += velocity.vel.x * deltaTime;
           break;
         case "up":
-          position.y -= velocity.vy * deltaTime;
+          position.pos.y -= velocity.vel.y * deltaTime;
           break;
         case "down":
-          position.y += velocity.vy * deltaTime;
+          position.pos.y += velocity.vel.y * deltaTime;
           break;
       }
 
       for (const enemy of enemies) {
-        const enCol = enemy.getComponent("ColliderComponent");
-        const enPos = enemy.getComponent("PositionComponent");
+        const enCol =
+          enemy.getComponent<ColliderComponent>("ColliderComponent");
+        const enPos =
+          enemy.getComponent<PositionComponent>("PositionComponent");
+
+        if (!enCol || !enPos) return;
 
         if (this.isColliding(position, collider, enCol, enPos)) {
           this.resolveCollision(projectile, enemy);
         }
       }
 
-      // Reduce lifetime and check if expired
       lifetime.time -= deltaTime;
       if (lifetime.time <= 0) {
+        // If there is animation runnin wait for it to complete then delete else delete immediately
         if (animation) {
           if (animation.isCompleted) {
             this.entitiesToDelete.push(projectile.id);
@@ -87,32 +120,41 @@ export class ProjectileSystem extends System {
     enPos: PositionComponent
   ) {
     return (
-      position.x < enPos.x + enCol.w &&
-      position.x + collider.w > enPos.x &&
-      position.y < enPos.y + enCol.h &&
-      position.y + collider.h > enPos.y
+      position.pos.x < enPos.pos.x + enCol.w &&
+      position.pos.x + collider.w > enPos.pos.x &&
+      position.pos.y < enPos.pos.y + enCol.h &&
+      position.pos.y + collider.h > enPos.pos.y
     );
   }
 
   resolveCollision(projectile: Entity, enemy: Entity) {
-    const damage = projectile.getComponent("DamageComponent");
-    const hitTracking = projectile.getComponent("HitTrackingComponent");
+    const damage = projectile.getComponent<DamageComponent>("DamageComponent");
+    const hitTracking = projectile.getComponent<HitTrackingComponent>(
+      "HitTrackingComponent"
+    );
 
-    const health = enemy.getComponent("HealthComponent");
-    const animation = enemy.getComponent(
-      "AnimationComponent"
-    ) as AnimationComponent<PlayerAnimations>;
+    const health = enemy.getComponent<HealthComponent>("HealthComponent");
+    const animation =
+      enemy.getComponent<AnimationComponent<PlayerAnimations>>(
+        "AnimationComponent"
+      );
+
+    if (!damage || !health) return;
 
     if (hitTracking) {
       if (hitTracking.hasHit(enemy.id)) return;
       hitTracking.addHit(enemy.id);
-      console.log(hitTracking.hitEnemies);
     }
 
     health.health -= damage.value;
-    animation.Frame = "damage";
+    if (animation && animation.currentAnimation !== "damage") {
+      animation.Frame = "damage";
+    }
 
-    if (projectile.getComponent("TagComponent").tag === "projectile") {
+    if (
+      projectile.getComponent<TagComponent>("TagComponent")?.tag ===
+      "projectile"
+    ) {
       this.scene.entityManager.removeEntityById(projectile.id);
     }
 

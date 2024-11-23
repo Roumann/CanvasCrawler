@@ -1,3 +1,5 @@
+import { System } from "../../../engine/core";
+import { isOverlappingAABB } from "../../../engine/math/is-overlapping-aabb";
 import {
   ColliderComponent,
   CollisionDamageComponent,
@@ -6,7 +8,6 @@ import {
   SpriteComponent,
   TagComponent,
 } from "../../components";
-import { System } from "../../core";
 
 export class EnemyCollisionSystem extends System {
   constructor() {
@@ -18,39 +19,30 @@ export class EnemyCollisionSystem extends System {
     const enemyEntities = this.scene.entityManager.getEntitiesByTag("enemy");
 
     // TODO FIX THIS
-    const position = player.getComponent("PositionComponent");
-    const size = player.getComponent("ColliderComponent");
+    const position =
+      player.getComponent<PositionComponent>("PositionComponent");
+    const size = player.getComponent<ColliderComponent>("ColliderComponent");
 
-    const health = player.getComponent("HealthComponent");
+    const health = player.getComponent<HealthComponent>("HealthComponent");
 
     if (!position || !size || !health) return;
 
     enemyEntities.forEach((enemyEntity) => {
-      const enemySize = enemyEntity.getComponent("ColliderComponent");
-      const enemyPos = enemyEntity.getComponent("PositionComponent");
-      const damage = enemyEntity.getComponent("CollisionDamageComponent");
+      const enemySize =
+        enemyEntity.getComponent<ColliderComponent>("ColliderComponent");
+      const enemyPos =
+        enemyEntity.getComponent<PositionComponent>("PositionComponent");
+      const damage = enemyEntity.getComponent<CollisionDamageComponent>(
+        "CollisionDamageComponent"
+      );
       const enemyId = enemyEntity.id;
 
       if (!enemySize || !enemyPos || !damage) return;
 
-      if (this.isColliding(position, size, enemySize, enemyPos)) {
+      if (isOverlappingAABB(position.pos, size, enemyPos.pos, enemySize)) {
         this.resolveCollision(health, damage, enemyPos, enemyId);
       }
     });
-  }
-
-  isColliding(
-    position: PositionComponent,
-    size: ColliderComponent,
-    wallSize: ColliderComponent,
-    wallPosition: PositionComponent
-  ) {
-    return (
-      position.x < wallPosition.x + wallSize.w &&
-      position.x + size.w > wallPosition.x &&
-      position.y < wallPosition.y + wallSize.h &&
-      position.y + size.h > wallPosition.y
-    );
   }
 
   resolveCollision(
@@ -63,11 +55,12 @@ export class EnemyCollisionSystem extends System {
 
     // SYSTEM DOESNT DELET ENTITIES - ONLY MARKS THEM FOR DELETION
     // ADD ISALIVE TAG TO ENTITY AFTER RENDER IF FLAG FALSE = DELETE IT
-
     if (health.health === -500) {
       this.scene.entityManager
         .createEntity()
-        .addComponent(new PositionComponent({ x: enemyPos.x, y: enemyPos.y }))
+        .addComponent(
+          new PositionComponent({ x: enemyPos.pos.x, y: enemyPos.pos.y })
+        )
         .addComponent(new ColliderComponent({ w: 32, h: 32 }))
         .addComponent(new SpriteComponent({ src: "/items/gem.png" }))
         .addComponent(new TagComponent({ tag: "drop" }));

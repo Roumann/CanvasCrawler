@@ -1,3 +1,5 @@
+import { Entity, System } from "../../../engine/core";
+import { isOverlappingAABB } from "../../../engine/math/is-overlapping-aabb";
 import {
   ColliderComponent,
   PositionComponent,
@@ -5,8 +7,8 @@ import {
   CollisionDamageComponent,
   SpriteComponent,
   TagComponent,
+  FixedPositionComponent,
 } from "../../components";
-import { System, Entity } from "../../core";
 
 export class CollisionSystem extends System {
   update(deltaTime: number) {
@@ -20,45 +22,51 @@ export class CollisionSystem extends System {
       for (let j = i + 1; j < collidableEntities.length; j++) {
         if (collidableEntities[i] === collidableEntities[j]) continue;
 
-        if (this.isColliding(collidableEntities[i], collidableEntities[j])) {
+        let entity1 = collidableEntities[i];
+        let entity2 = collidableEntities[j];
+
+        const pos1 =
+          entity1.getComponent<PositionComponent>("PositionComponent");
+        const coll1 =
+          entity1.getComponent<ColliderComponent>("ColliderComponent");
+        const pos2 =
+          entity2.getComponent<PositionComponent>("PositionComponent");
+        const coll2 =
+          entity2.getComponent<ColliderComponent>("ColliderComponent");
+
+        const isFixed1 = entity1.hasComponent("FixedPositionComponent");
+        const isFixed2 = entity2.hasComponent("FixedPositionComponent");
+
+        if (!pos1 || !coll1 || !pos2 || !coll2) return;
+
+        if (isOverlappingAABB(pos1.pos, coll1, pos2.pos, coll2)) {
           this.resolveWallCollision(
-            collidableEntities[i],
-            collidableEntities[j]
+            pos1,
+            coll1,
+            isFixed1,
+            pos2,
+            coll2,
+            isFixed2
           );
         }
       }
     }
   }
 
-  isColliding(entity1: Entity, entity2: Entity) {
-    const position1 = entity1.getComponent("PositionComponent");
-    const size1 = entity1.getComponent("ColliderComponent");
-    const position2 = entity2.getComponent("PositionComponent");
-    const size2 = entity2.getComponent("ColliderComponent");
-
-    return (
-      position1.x < position2.x + size2.w &&
-      position1.x + size1.w > position2.x &&
-      position1.y < position2.y + size2.h &&
-      position1.y + size1.h > position2.y
-    );
-  }
-
-  resolveWallCollision(entity1: Entity, entity2: Entity) {
-    const position1 = entity1.getComponent("PositionComponent");
-    const size1 = entity1.getComponent("ColliderComponent");
-    const position2 = entity2.getComponent("PositionComponent");
-    const size2 = entity2.getComponent("ColliderComponent");
-
-    const isFixed1 = entity1.hasComponent("FixedPositionComponent");
-    const isFixed2 = entity2.hasComponent("FixedPositionComponent");
-
+  resolveWallCollision(
+    pos1: PositionComponent,
+    coll1: ColliderComponent,
+    isFixed1: boolean,
+    pos2: PositionComponent,
+    coll2: ColliderComponent,
+    isFixed2: boolean
+  ) {
     // Calculate overlap distances
-    const deltaX = position1.x + size1.w / 2 - (position2.x + size2.w / 2);
-    const deltaY = position1.y + size1.h / 2 - (position2.y + size2.h / 2);
+    const deltaX = pos1.pos.x + coll1.w / 2 - (pos2.pos.x + coll2.w / 2);
+    const deltaY = pos1.pos.y + coll1.h / 2 - (pos2.pos.y + coll2.h / 2);
 
-    const overlapX = size1.w / 2 + size2.w / 2 - Math.abs(deltaX);
-    const overlapY = size1.h / 2 + size2.h / 2 - Math.abs(deltaY);
+    const overlapX = coll1.w / 2 + coll2.w / 2 - Math.abs(deltaX);
+    const overlapY = coll1.h / 2 + coll2.h / 2 - Math.abs(deltaY);
 
     if (overlapX > 0 && overlapY > 0) {
       // Determine the minimum axis of penetration
@@ -66,23 +74,23 @@ export class CollisionSystem extends System {
         // Resolve horizontal collision
         if (deltaX > 0) {
           // Entity1 is to the right of Entity2
-          if (!isFixed1) position1.x += overlapX;
-          if (!isFixed2) position2.x -= overlapX;
+          if (!isFixed1) pos1.pos.x += overlapX;
+          if (!isFixed2) pos2.pos.x -= overlapX;
         } else {
           // Entity1 is to the left of Entity2
-          if (!isFixed1) position1.x -= overlapX;
-          if (!isFixed2) position2.x += overlapX;
+          if (!isFixed1) pos1.pos.x -= overlapX;
+          if (!isFixed2) pos2.pos.x += overlapX;
         }
       } else {
         // Resolve vertical collision
         if (deltaY > 0) {
           // Entity1 is below Entity2
-          if (!isFixed1) position1.y += overlapY;
-          if (!isFixed2) position2.y -= overlapY;
+          if (!isFixed1) pos1.pos.y += overlapY;
+          if (!isFixed2) pos2.pos.y -= overlapY;
         } else {
           // Entity1 is above Entity2
-          if (!isFixed1) position1.y -= overlapY;
-          if (!isFixed2) position2.y += overlapY;
+          if (!isFixed1) pos1.pos.y -= overlapY;
+          if (!isFixed2) pos2.pos.y += overlapY;
         }
       }
     }
@@ -99,7 +107,9 @@ export class CollisionSystem extends System {
     if (health.health <= 0) {
       this.scene.entityManager
         .createEntity()
-        .addComponent(new PositionComponent({ x: enemyPos.x, y: enemyPos.y }))
+        .addComponent(
+          new PositionComponent({ x: enemyPos.pos.x, y: enemyPos.pos.y })
+        )
         .addComponent(
           new ColliderComponent({
             w: 32,

@@ -1,5 +1,3 @@
-import { World, Scene } from "./game/core";
-
 import {
   AnimationSystem,
   EnemyCollisionSystem,
@@ -18,29 +16,31 @@ import {
   DirectionComponent,
   HealthComponent,
   InventoryComponent,
-  PassiveItemComponent,
   PositionComponent,
   SpriteComponent,
   SpriteOffsetComponent,
   TagComponent,
   VelocityComponent,
-  WeaponComponent,
 } from "./game/components";
+import { FollowPlayerComponent } from "./game/components/FollowPlayer";
+import { AccelerationComponent } from "./game/components/Acceleration";
 
 import { PlayerAnimations, playerAnimations } from "./game/animations/player";
-import { EventDispatcher } from "./game/core/Events";
-import { weaponFactory } from "./game/archetypes/weapons/WeaponFactory";
+
 import walls from "./game/config/map/mapa_1.json";
 
 import { InventoryUISystem } from "./game/systems/rendering/InventoryUISystem";
 import { CollisionSystem } from "./game/systems/physics/Collision";
-import { SlashAnimation, slashAnimation } from "./game/animations/slash";
-import { TestAnimation, testAnimation } from "./game/animations/test";
+import { EnemyMovement } from "./game/systems/gameplay/EnemyMovement";
+import { KeyboardControls } from "./game/components/KeyboardControls";
+import { Engine } from "./engine/core/engine";
+import { Scene } from "./engine/core/scene";
+import { weaponFactory } from "./game/prefabs/weapons/WeaponFactory";
 
 const canvas = document.getElementById("game-canvas") as HTMLCanvasElement;
 const ctx = canvas.getContext("2d");
 
-const world = new World({
+const world = new Engine({
   isPaused: false, // TODO Maybe move this to the scene? so when switching scenes it can be paused / or teardown
 });
 
@@ -62,12 +62,13 @@ const overworld = new Scene({
 
 overworld.systemManager.addSystems([
   new MovementSystem(),
-  new AnimationSystem(),
-  // new CollisionSystem(),
+  // new EnemyMovement(), // TODO maybe create geenral movement component and then add keyboard component that will controlls the movement or enemyAI system that will controll it
   new WallCollisionSystem(),
+  // new CollisionSystem(),
   new EnemyCollisionSystem(),
   new PlayerAttackSystem(),
   new ProjectileSystem(),
+  new AnimationSystem(),
   new RenderSystem({ debug: true }),
   // new InventoryUISystem({ context: ctx }),
 ]);
@@ -77,15 +78,17 @@ AddEnemies();
 const player = overworld.entityManager.createEntity();
 player
   .addComponent(new PositionComponent({ x: 10, y: 10 }))
+  .addComponent(new VelocityComponent({ vx: 1, vy: 1, friction: 0.6 }))
+  .addComponent(new AccelerationComponent({ ax: 1, ay: 1, base: 1 }))
   .addComponent(new ColliderComponent({ w: 16, h: 22 }))
-  .addComponent(new VelocityComponent({ vx: 120, vy: 120 }))
-  .addComponent(new HealthComponent({ health: 100 }))
+  .addComponent(new DirectionComponent({ direction: "right" }))
   .addComponent(
     new SpriteComponent({
       src: "/characters/char_4.png",
       size: { w: 15, h: 21 },
     })
   )
+  .addComponent(new SpriteOffsetComponent({ x: 8, y: 8 }))
   .addComponent(
     new AnimationComponent({
       animations: playerAnimations,
@@ -95,26 +98,18 @@ player
       loop: true,
     })
   )
-  .addComponent(new DirectionComponent({ direction: "right" }))
-  .addComponent(new SpriteOffsetComponent({ x: 8, y: 8 }))
   .addComponent(
     new InventoryComponent({
       weapons: [
         weaponFactory.createWeapon("fireball"),
         weaponFactory.createWeapon("sword"),
       ],
-      items: [
-        new PassiveItemComponent({
-          name: "Heal",
-          description: "Heals 10 health",
-        }),
-      ],
     })
   )
-  .addComponent(new DirectionComponent({ direction: "right" }))
+  .addComponent(new HealthComponent({ health: 100 }))
   .addComponent(new CameraFollowComponent())
-  .addComponent(new TagComponent({ tag: "player" }))
-  .addComponent(new EventDispatcher());
+  .addComponent(new KeyboardControls())
+  .addComponent(new TagComponent({ tag: "player" }));
 
 world.addScene(overworld);
 
@@ -156,7 +151,7 @@ function AddEnemies() {
           h: 22,
         })
       )
-      .addComponent(new VelocityComponent({ vx: 120, vy: 120 }))
+      .addComponent(new VelocityComponent({ vx: 120, vy: 120, friction: 0.1 }))
       .addComponent(new HealthComponent({ health: 100 })) // TODO change this
       .addComponent(new CollisionDamageComponent({ damage: 10 }))
       .addComponent(
@@ -168,6 +163,7 @@ function AddEnemies() {
           loop: true,
         })
       )
+      .addComponent(new FollowPlayerComponent())
       .addComponent(new SpriteOffsetComponent({ x: 8, y: 8 }))
       .addComponent(
         new SpriteComponent({

@@ -1,4 +1,3 @@
-import { System } from "../../core/System";
 import {
   ColliderComponent,
   InventoryComponent,
@@ -8,12 +7,14 @@ import {
   VelocityComponent,
   WeaponComponent,
 } from "../../components";
-import { Entity } from "../../core";
-import { DirectionComponent } from "../../components/physics/DirectionComponent";
-import { LifeTimeComponent } from "../../components/gameplay/LifeTimeComponent";
-import { DamageComponent } from "../../components/gameplay/DamageComponent";
-import { AnimationComponent } from "../../components/rendering/Animation";
-import { HitTrackingComponent } from "../../components/gameplay/HitTrackingComponent";
+
+import { DirectionComponent } from "../../components/DirectionComponent";
+import { LifeTimeComponent } from "../../components/LifeTimeComponent";
+import { DamageComponent } from "../../components/DamageComponent";
+import { AnimationComponent } from "../../components/Animation";
+import { HitTrackingComponent } from "../../components/HitTrackingComponent";
+import { AccelerationComponent } from "../../components/Acceleration";
+import { Entity, System } from "../../../engine/core";
 
 export class PlayerAttackSystem extends System {
   constructor() {
@@ -41,10 +42,9 @@ export class PlayerAttackSystem extends System {
   // TODO think about this more
 
   update(deltaTime: number) {
-    const player = this.scene.entityManager.getEntitiesByTag("player")[0];
-    const inventory = player.getComponent(
-      "InventoryComponent"
-    ) as InventoryComponent;
+    const player = this.scene.entityManager.getEntityByTag("player");
+    const inventory =
+      player.getComponent<InventoryComponent>("InventoryComponent");
 
     if (inventory && inventory.weapons.length > 0) {
       for (const weapon of inventory.weapons) {
@@ -75,13 +75,10 @@ export class PlayerAttackSystem extends System {
   }
 
   meleeAttack(weapon: WeaponComponent, player: Entity) {
-    const position = player.getComponent(
-      "PositionComponent"
-    ) as PositionComponent;
-
-    const direction = player.getComponent(
-      "DirectionComponent"
-    ) as DirectionComponent;
+    const position =
+      player.getComponent<PositionComponent>("PositionComponent");
+    const direction =
+      player.getComponent<DirectionComponent>("DirectionComponent");
 
     if (!position || !direction) return;
 
@@ -91,13 +88,14 @@ export class PlayerAttackSystem extends System {
     meleeAttack
       .addComponent(
         new PositionComponent({
-          x: position.x + offset,
-          y: position.y,
+          x: position.pos.x + offset,
+          y: position.pos.y,
         })
       )
+      .addComponent(new VelocityComponent({ vx: 1, vy: 1, friction: 0.9 }))
+      .addComponent(new AccelerationComponent({ ax: 1, ay: 1, base: 1 }))
       .addComponent(new ColliderComponent(weapon.config.collider))
       .addComponent(weapon.sprite.img)
-      .addComponent(new VelocityComponent(weapon.config.velocity))
       .addComponent(new LifeTimeComponent({ time: weapon.config.lifeTime }))
       .addComponent(new DamageComponent({ value: weapon.config.damage }))
       .addComponent(new HitTrackingComponent())
@@ -110,13 +108,10 @@ export class PlayerAttackSystem extends System {
   }
 
   projectileAttack(weapon: WeaponComponent, player: Entity) {
-    const position = player.getComponent(
-      "PositionComponent"
-    ) as PositionComponent;
-
-    const direction = player.getComponent(
-      "DirectionComponent"
-    ) as DirectionComponent;
+    const position =
+      player.getComponent<PositionComponent>("PositionComponent");
+    const direction =
+      player.getComponent<DirectionComponent>("DirectionComponent");
 
     if (!position || !direction) return;
 
@@ -127,14 +122,16 @@ export class PlayerAttackSystem extends System {
       .createEntity()
       .addComponent(
         new PositionComponent({
-          x: position.x + offsetX,
-          y: position.y + offsetY,
+          x: position.pos.x + offsetX,
+          y: position.pos.y + offsetY,
         })
       )
+      .addComponent(new VelocityComponent({ vx: 1, vy: 1, friction: 0.6 }))
+      .addComponent(new AccelerationComponent({ ax: 1, ay: 1, base: 1 }))
       .addComponent(new ColliderComponent(weapon.config.collider))
       .addComponent(weapon.sprite.img)
       .addComponent(new SpriteOffsetComponent(weapon.sprite.offset))
-      .addComponent(new VelocityComponent(weapon.config.velocity))
+      .addComponent(new VelocityComponent(weapon.config.velocity!)) // TODO fix this type
       .addComponent(new LifeTimeComponent({ time: weapon.config.lifeTime }))
       .addComponent(new DamageComponent({ value: weapon.config.damage }))
       .addComponent(new DirectionComponent({ direction: direction.direction }))

@@ -1,4 +1,4 @@
-import { Entity, System } from "../../core";
+import { System } from "../../../engine/core";
 
 export class ProjectileCollisionSystem extends System {
   constructor() {

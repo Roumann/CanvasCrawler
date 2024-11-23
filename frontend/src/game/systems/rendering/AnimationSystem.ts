@@ -1,6 +1,6 @@
+import { System } from "../../../engine/core";
 import { PlayerAnimations } from "../../animations/player";
-import { AnimationComponent } from "../../components/rendering/Animation";
-import { System } from "../../core";
+import { AnimationComponent } from "../../components/Animation";
 
 export class AnimationSystem extends System {
   constructor() {
@@ -13,12 +13,12 @@ export class AnimationSystem extends System {
     if (!entities) return;
 
     for (const entity of entities) {
-      const animation = entity.getComponent(
-        "AnimationComponent"
-      ) as AnimationComponent<PlayerAnimations>;
+      const animation =
+        entity.getComponent<AnimationComponent<PlayerAnimations>>(
+          "AnimationComponent"
+        );
       if (!animation) continue;
 
-      //
       if (animation.animationProgress >= 0) {
         animation.animationProgress -= 1;
       } else {

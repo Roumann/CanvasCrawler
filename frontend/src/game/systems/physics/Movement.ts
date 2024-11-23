@@ -1,112 +1,120 @@
-import { DirectionComponent } from "../../components/physics/DirectionComponent";
-import { AnimationComponent } from "../../components/rendering/Animation";
-import { System } from "../../core";
-import { clamp } from "../../utils/clamp";
-import { Rect } from "../../utils/Rect";
+import { PlayerAnimations } from "../../animations/player";
+import {
+  ColliderComponent,
+  PositionComponent,
+  VelocityComponent,
+} from "../../components";
+import { AccelerationComponent } from "../../components/Acceleration";
+import { DirectionComponent } from "../../components/DirectionComponent";
+import { AnimationComponent } from "../../components/Animation";
+
+import { clamp } from "../../../engine/math/clamp";
+
+import { System } from "../../../engine/core";
+import { Rect } from "../../../engine/math/rect";
 
 export class MovementSystem extends System {
-  pressedKeys: Set<string>;
-  keyMap: { [key: string]: string };
   bounds: Rect;
 
   constructor() {
     super();
-    this.pressedKeys = new Set();
-    this.keyMap = {
-      ArrowLeft: "left",
-      ArrowRight: "right",
-      ArrowUp: "up",
-      ArrowDown: "down",
-    };
-
     this.bounds = new Rect({ x: 0, y: 0, w: 3200, h: 3200 });
-
-    this.addEventListeners();
   }
 
-  addEventListeners() {
-    window.addEventListener("keydown", (e) => {
-      if (this.keyMap[e.key] && !this.pressedKeys.has(this.keyMap[e.key])) {
-        this.pressedKeys.add(this.keyMap[e.key]);
-      }
-    });
-
-    window.addEventListener("keyup", (e) => {
-      if (this.keyMap[e.key]) {
-        this.pressedKeys.delete(this.keyMap[e.key]);
-      }
-    });
-  }
-
-  // TODO change the velocity instead of position
-  update(deltaTime: number) {
+  update() {
     if (!this.scene) return;
+    const keys = this.scene.inputManager;
 
-    const player = this.scene.entityManager.getEntityByTag("player");
+    // This way i could have a system like enemyAI that will return left = true; and then movement system will move the enemy
 
-    const position = player.getComponent("PositionComponent");
-    const velocity = player.getComponent("VelocityComponent");
-    const size = player.getComponent("ColliderComponent");
-    const direction = player.getComponent(
-      "DirectionComponent"
-    ) as DirectionComponent;
+    // TODO add dash - when pressing space add DashComponent to player - Dash System will pick it up reduce dash time add velocity to player and after
+    // dash expires remove component from player - when dash component is on player return early from movement to prevent moving while dashing
 
-    const animation = player.getComponent("AnimationComponent");
+    const entities = this.scene.entityManager.getEntitiesWithComponents([
+      "KeyboardControls",
+    ]);
 
-    if (!position || !velocity || !size || !direction) return;
+    for (const entity of entities) {
+      const position =
+        entity.getComponent<PositionComponent>("PositionComponent");
+      const velocity =
+        entity.getComponent<VelocityComponent>("VelocityComponent");
+      const acc = entity.getComponent<AccelerationComponent>(
+        "AccelerationComponent"
+      );
+      const collider =
+        entity.getComponent<ColliderComponent>("ColliderComponent");
+      const direction =
+        entity.getComponent<DirectionComponent>("DirectionComponent");
+      const animation =
+        entity.getComponent<AnimationComponent<PlayerAnimations>>(
+          "AnimationComponent"
+        );
 
-    if (this.pressedKeys.size === 0) {
-      this.setIdleAnimation(direction, animation);
-      return;
-    }
+      if (!position || !velocity || !acc || !collider || !direction) return;
 
-    // TODO move animtaions from movement system to animation system
-    this.pressedKeys.forEach((keyDirection) => {
-      switch (keyDirection) {
-        case "left":
-          direction.direction = "left";
-
-          if (animation) {
-            animation.currentAnimation = "walk-left";
-          }
-
-          position.x -= velocity.vx * deltaTime;
-          break;
-        case "right":
-          direction.direction = "right";
-          if (animation) {
-            animation.currentAnimation = "walk-right";
-          }
-
-          position.x += velocity.vx * deltaTime;
-          break;
-        case "up":
-          if (animation) {
-            animation.currentAnimation =
-              direction.direction === "left" ? "walk-up-l" : "walk-up-r";
-          }
-
-          position.y -= velocity.vy * deltaTime;
-
-          break;
-        case "down":
-          if (animation) {
-            animation.currentAnimation =
-              direction.direction === "left" ? "walk-down-l" : "walk-down-r";
-          }
-
-          position.y += velocity.vy * deltaTime;
-          break;
+      if (!keys.isPressed()) {
+        this.setIdleAnimation(direction, animation);
+        continue;
       }
-    });
 
-    position.x = clamp(position.x, 0, this.bounds.w - size.w);
-    position.y = clamp(position.y, 0, this.bounds.h - size.h);
+      // TODO move animtaions from movement system to animation system
+      if (keys.isKeyPressed("ArrowLeft")) {
+        direction.direction = "left";
+        if (animation) {
+          animation.currentAnimation = "walk-left";
+        }
+        acc.acc.x = -acc.base;
+      }
+      if (keys.isKeyPressed("ArrowRight")) {
+        direction.direction = "right";
+        if (animation) {
+          animation.currentAnimation = "walk-right";
+        }
+        acc.acc.x = acc.base;
+      }
+      if (keys.isKeyPressed("ArrowUp")) {
+        if (animation) {
+          animation.currentAnimation =
+            direction.direction === "left" ? "walk-up-l" : "walk-up-r";
+        }
+        acc.acc.y = -acc.base;
+      }
+      if (keys.isKeyPressed("ArrowDown")) {
+        if (animation) {
+          animation.currentAnimation =
+            direction.direction === "left" ? "walk-down-l" : "walk-down-r";
+        }
+        acc.acc.y = acc.base;
+      }
+      if (!keys.isKeyPressed("ArrowLeft") && !keys.isKeyPressed("ArrowRight")) {
+        acc.acc.x = 0;
+      }
+      if (!keys.isKeyPressed("ArrowUp") && !keys.isKeyPressed("ArrowDown")) {
+        acc.acc.y = 0;
+      }
+
+      // normalize acceleration vector, this keeps the diagonal movement and axis movement the same speed
+      // then scale it by the base acceleration
+      acc.acc = acc.acc.unit().mult(acc.base);
+
+      // apply acceleration in the direction of the target
+      velocity.vel = velocity.vel.add(acc.acc);
+      // apply friction to slow down the ball over time, stops the object from moving forever
+      velocity.vel = velocity.vel.mult(1 - velocity.friction);
+
+      // update the position by adding the velocity vector, velocity determines how far the object move this frame
+      position.pos = position.pos.add(velocity.vel);
+
+      // Clamp the position to the bounds of the scene
+      position.pos.x = clamp(position.pos.x, 0, this.bounds.w - collider.w);
+      position.pos.y = clamp(position.pos.y, 0, this.bounds.h - collider.h);
+    }
   }
 
   setIdleAnimation(
     direction: DirectionComponent,
-    animation: AnimationComponent
+    animation: AnimationComponent<PlayerAnimations> | undefined
   ) {
     if (!animation) return;
     const idleDir = direction.direction === "left" ? "left" : "right";

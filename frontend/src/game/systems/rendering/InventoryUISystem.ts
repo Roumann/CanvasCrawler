@@ -1,5 +1,9 @@
-import { HealthComponent, InventoryComponent } from "../../components";
-import { System } from "../../core";
+import { System } from "../../../engine/core";
+import {
+  HealthComponent,
+  InventoryComponent,
+  PositionComponent,
+} from "../../components";
 
 export type TInventoryUISystem = {
   context: CanvasRenderingContext2D | null;
@@ -17,17 +21,17 @@ export class InventoryUISystem extends System {
     if (!this.ctx) return;
 
     const player = this.scene.entityManager.getEntityByTag("player");
-    const playerInventory = player.getComponent(
-      "InventoryComponent"
-    ) as InventoryComponent;
-    const position = player.getComponent("PositionComponent");
-    const healthBar = player.getComponent("HealthComponent") as HealthComponent;
+    const playerInventory =
+      player.getComponent<InventoryComponent>("InventoryComponent");
+    const position =
+      player.getComponent<PositionComponent>("PositionComponent");
+    const healthBar = player.getComponent<HealthComponent>("HealthComponent");
 
-    console.log(healthBar.health);
+    if (!playerInventory || !position || !healthBar) return;
 
     this.ctx.imageSmoothingEnabled = false;
     this.ctx.fillStyle = "green";
-    this.ctx.fillRect(position.x, position.y + 25, healthBar.health, 3);
+    this.ctx.fillRect(position.pos.x, position.pos.y + 25, healthBar.health, 3);
 
     for (let i = 0; i < playerInventory.weapons.length; i++) {
       this.ctx.fillStyle = "red";
