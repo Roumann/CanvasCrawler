@@ -10,7 +10,7 @@ export class SystemManager {
     this.nextId = 1;
   }
 
-  start(deltaTime: number) {
+  update(deltaTime: number) {
     for (const system of this.systems) {
       system.update(deltaTime);
     }

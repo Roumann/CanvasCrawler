@@ -18,11 +18,15 @@ export abstract class System {
     this._scene = scene;
   }
 
-  abstract update(...args: any[]): void;
+  /**
+   *
+   * Main update function for the system.
+   */
+  abstract update(...args: any): void;
 
   /**
    * Called after update functions in all systems have been called.
-   * This is where you should do any cleanup.
+   * This is where you should do any entity cleanup.
    */
-  cleanUp() {}
+  cleanUp(...args: any): void {}
 }

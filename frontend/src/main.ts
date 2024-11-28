@@ -36,34 +36,35 @@ import { KeyboardControls } from "./game/components/KeyboardControls";
 import { Engine } from "./engine/core/engine";
 import { Scene } from "./engine/core/scene";
 import { weaponFactory } from "./game/prefabs/weapons/WeaponFactory";
+import { Rect } from "./engine/math/rect";
+import { MenuSystem } from "./game/systems/rendering/MenuSystem";
 
 const canvas = document.getElementById("game-canvas") as HTMLCanvasElement;
 const ctx = canvas.getContext("2d");
+if (!ctx) throw new Error("Canvas not found");
 
-const world = new Engine({
-  isPaused: false, // TODO Maybe move this to the scene? so when switching scenes it can be paused / or teardown
-});
+const world = new Engine();
 
 const overworld = new Scene({
   name: "overworld",
   context: ctx,
-  camera: {
-    bounds: { min: 0, max: 3200 },
-  },
+  bounds: new Rect({ x: 0, y: 0, w: 3200, h: 3200 }),
+
   // TODO - add option to creating the world
   // Either what i have right now static image and array of walls or
   // allow user to use Tilemap and create the world from it
-  background: {
+  environment: {
     src: "/maps/mapa1.png",
     size: { w: 3200, h: 3200 },
+    walls: walls,
   },
-  walls: walls,
 });
 
 overworld.systemManager.addSystems([
   new MovementSystem(),
   // new EnemyMovement(), // TODO maybe create geenral movement component and then add keyboard component that will controlls the movement or enemyAI system that will controll it
   new WallCollisionSystem(),
+  new MenuSystem(),
   // new CollisionSystem(),
   new EnemyCollisionSystem(),
   new PlayerAttackSystem(),

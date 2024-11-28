@@ -1,44 +1,45 @@
 import { PositionComponent } from "../../game/components";
 import { clamp } from "../math/clamp";
+import { Rect } from "../math/rect";
 import { Vector2 } from "../math/vector2";
 import { EntityManager } from "./managers/entity-manager";
 
 export type TCamera = {
-  camera: { bounds: { min: number; max: number } };
-  context: CanvasRenderingContext2D | null;
+  bounds: Rect;
+  context: CanvasRenderingContext2D;
 };
 
 export class Camera {
+  bounds: Rect;
+  context: CanvasRenderingContext2D;
   pos: Vector2;
-  cameraBounds: { min: number; max: number };
-  context: CanvasRenderingContext2D | null;
 
-  constructor({ camera, context }: TCamera) {
+  constructor({ bounds, context }: TCamera) {
     this.pos = new Vector2(0, 0);
     this.context = context;
-    this.cameraBounds = camera.bounds;
+    this.bounds = bounds;
   }
 
   update(entityManager: EntityManager) {
     const follow = entityManager.getEntityWithComponent([
       "CameraFollowComponent",
     ]);
+    if (!follow) return;
 
-    if (!follow || !this.context) return;
     const position =
       follow.getComponent<PositionComponent>("PositionComponent");
     if (!position) return;
 
     this.pos.x = clamp(
       position.pos.x - this.context.canvas.width / 2,
-      this.cameraBounds.min,
-      this.cameraBounds.max - this.context.canvas.width
+      this.bounds.x,
+      this.bounds.x + this.bounds.w - this.context.canvas.width
     );
 
     this.pos.y = clamp(
       position.pos.y - this.context.canvas.height / 2,
-      this.cameraBounds.min,
-      this.cameraBounds.max - this.context.canvas.height
+      this.bounds.y,
+      this.bounds.y + this.bounds.h - this.context.canvas.height
     );
   }
 

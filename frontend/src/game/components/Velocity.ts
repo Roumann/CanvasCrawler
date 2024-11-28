@@ -6,6 +6,8 @@ export type TVelocityComponent = {
   friction: number;
 };
 
+// TODO maybe merge velocity and acceleration component since they are required together
+
 export class VelocityComponent {
   vel: Vector2;
   friction: number;

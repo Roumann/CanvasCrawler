@@ -1,79 +1,71 @@
-import {
-  ColliderComponent,
-  FixedPositionComponent,
-  PositionComponent,
-  TileComponent,
-} from "../../game/components";
-import { SceneBackground } from "../../game/components/SceneBackground";
-
 import { InputManager } from "./managers/input-manager";
-
 import { EntityManager } from "./managers/entity-manager";
 import { SystemManager } from "./managers/system-manager";
 import { Camera } from "./camera";
+import { Rect } from "../math/rect";
+import {
+  SceneEnvironment,
+  TSceneEnvironment,
+} from "../../game/components/SceneEnvironment";
 
 export type TScene = {
   name: string;
-  context: CanvasRenderingContext2D | null;
-  camera: {
-    bounds: { min: number; max: number };
-  };
-  background?: {
-    src: string;
-    size: { w: number; h: number };
-  };
-  walls?: any;
+  context: CanvasRenderingContext2D;
+  bounds: Rect;
+  environment?: TSceneEnvironment;
 };
 
 export class Scene {
   name: string;
-  context: CanvasRenderingContext2D | null;
+
+  context: CanvasRenderingContext2D;
   camera: Camera;
-  background?: SceneBackground | null;
-  walls?: any | null;
+  isPaused: boolean;
+
   entityManager: EntityManager;
   systemManager: SystemManager;
   inputManager: InputManager;
 
-  constructor({ name, context, camera, background, walls }: TScene) {
+  sceneEnvironment: SceneEnvironment;
+
+  constructor({ name, context, bounds, environment }: TScene) {
     this.name = name;
-    this.context = context ?? null;
+
     this.entityManager = new EntityManager();
     this.systemManager = new SystemManager(this);
-    this.inputManager = new InputManager();
+    this.inputManager = new InputManager(this); // TODO - this is maybe little too much coupled together??
+
+    this.context = context ?? null;
     this.camera = new Camera({
-      camera,
+      bounds,
       context: context,
     });
-    this.background = background ? new SceneBackground({ background }) : null;
-    this.walls = walls ? this.createWalls(walls) : null;
+    this.isPaused = false;
+    this.sceneEnvironment = new SceneEnvironment(environment, this);
+
+    // TODO - add event system
   }
 
-  update(deltaTime: number) {
-    this.systemManager.start(deltaTime);
+  // TODO - here initialize the scene specific stuff - like sprites, animations, etc
+  init() {}
 
-    // TODO maybe move this
+  update(deltaTime: number) {
+    if (this.isPaused) return;
+    this.systemManager.update(deltaTime);
+
     this.camera.update(this.entityManager);
   }
 
-  addCamera(camera: Camera) {
-    this.camera = camera;
+  // TODO - allow pausing the scene
+  pause() {
+    // this.systemManager.pause();
   }
 
-  createWalls(walls: any) {
-    walls.forEach((wall: any) => {
-      this.entityManager
-        .createEntity()
-        .addComponent(new PositionComponent({ x: wall.x, y: wall.y }))
-        .addComponent(
-          new ColliderComponent({
-            w: wall.width,
-            h: wall.height,
-          })
-        )
-        .addComponent(new FixedPositionComponent())
-        .addComponent(new TileComponent({ type: "wall" }));
-    });
+  // TODO - clean if scene is destroyed
+  cleanUp() {
+    // TODO - something like this
+    // this.systemManager.cleanUp();
+    // this.entityManager.cleanUp();
   }
 }
 
@@ -107,8 +99,4 @@ World can hold multiple scenes for example:
     - 10 enemies entities
     - space suite sprite
   
-  
-
-
-
 */
