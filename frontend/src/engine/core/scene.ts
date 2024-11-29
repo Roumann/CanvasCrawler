@@ -7,6 +7,7 @@ import {
   SceneEnvironment,
   TSceneEnvironment,
 } from "../../game/components/SceneEnvironment";
+import { EventQueue } from "./managers/event-manager";
 
 export type TScene = {
   name: string;
@@ -25,6 +26,7 @@ export class Scene {
   entityManager: EntityManager;
   systemManager: SystemManager;
   inputManager: InputManager;
+  eventQueue: EventQueue;
 
   sceneEnvironment: SceneEnvironment;
 
@@ -34,6 +36,7 @@ export class Scene {
     this.entityManager = new EntityManager();
     this.systemManager = new SystemManager(this);
     this.inputManager = new InputManager(this); // TODO - this is maybe little too much coupled together??
+    this.eventQueue = new EventQueue();
 
     this.context = context ?? null;
     this.camera = new Camera({
